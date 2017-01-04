@@ -1,0 +1,7 @@
+#+TITLE: Machine Learning Revision
+#+AUTHOR: Tom Eccles
+
+* About This Document
+This document contains my revision notes for COMP3206 Machine Learning as taught by Professor Mahesan Niranjan. This work was produced based on his lectures but any inaccuracies and misunderstandings contained herein are almost certainly my own mistake.
+
+This document my be distributed under the terms of the [[https://www.gnu.org/licenses/fdl.html][GNU Free Documentation Licence]]. A copy of the licence can be found [[https://www.gnu.org/licenses/fdl-1.3-standalone.html][here]].
