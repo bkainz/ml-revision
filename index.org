@@ -1,7 +1,105 @@
 #+TITLE: Machine Learning Revision
 #+AUTHOR: Tom Eccles
+#+LATEX_HEADER: \usepackage{amsmath}
 
 * About This Document
-This document contains my revision notes for COMP3206 Machine Learning as taught by Professor Mahesan Niranjan. This work was produced based on his lectures but any inaccuracies and misunderstandings contained herein are almost certainly my own mistake.
+This document contains my revision notes for COMP3206 Machine Learning as taught by Professor Mahesan Niranjan at the University of Southampton. This work was produced based on his lectures but any inaccuracies and misunderstandings contained herein are almost certainly my own mistake.
 
 This document my be distributed under the terms of the [[https://www.gnu.org/licenses/fdl.html][GNU Free Documentation Licence]]. A copy of the licence can be found [[https://www.gnu.org/licenses/fdl-1.3-standalone.html][here]].
+* Maths Review
+This section *very* briefly reviews some of the maths needed for the rest of the document.
+
+** Matrices and Vectors
+*** Basics
+A vector: 
+\begin{equation*}
+\mathbf{x} = \begin{pmatrix}
+x_1 \\ x_2 \\ x_3 \\ \vdots \\ x_N \end{pmatrix}
+\end{equation*}
+
+A matrix:
+\begin{equation*}
+\mathbf{A} = \begin{pmatrix}
+a_{11} & a_{12} & \cdots & a_{1n} \\
+a_{21} & a_{22} & \cdots & a_{2n} \\
+\vdots & \vdots & \vdots & \vdots \\
+a_{m1} & a_{m2} & \cdots & a_{mn} \\
+\end{pmatrix}
+\end{equation*}
+
+Matrix Multiplication:
+\begin{equation*}
+[\mathbf{A}\mathbf{B}]_{ij} = \sum_{k=1}^n A_{ik}B_{kj}
+\end{equation*}
+
+Scalar product of vectors: (where \theta is the angle between the vectors)
+\begin{equation*}
+\mathbf{x} \cdot \mathbf{y} = \sum_{i = 1}^{N} x_i y_i = \mathbf{x}^T \mathbf{y} = |\mathbf{x}| |\mathbf{y}| \cos(\theta) 
+\end{equation*}
+
+This can be used to project $\mathbf{x}$ along the direction $\mathbf{u}$:
+\begin{equation*}
+\mathrm{projection} = \frac{\mathbf{x}^T \mathbf{u}}{|\mathbf{u}|}\mathbf{u}
+\end{equation*}
+
+As an example of matrix algebra: a diagonal matrix is a scalar multiple of the identity matrix. A diagonalizable matrix can be written in erms of a diagonal matrix $\mathbf{D}$ and some transformation matrix $\mathbf{S}$ as follows:
+\begin{equation*}
+\mathbf{A} = \mathbf{SDS}^{-1} = \mathbf{S}a\mathbf{IS}^{-1}
+\end{equation*}
+
+Using this relationship, a diagonalizable matrix can be efficiently raised to a power using
+\begin{equation*}
+\mathbf{A}^n = \mathbf{SD}^n\mathbf{S}^{-1} = \mathbf{S}a^n\mathbf{IS}^{-1}
+\end{equation*}
+
+To prove this by induction for $n \in \mathbb{N}$:
+\begin{align*}
+\mathbf{A}^1 =& \mathbf{SD}^1\mathbf{S}^{-1} \\
+\mathrm{Assume } \: \mathbf{A}^n =& \mathbf{SD}^n\mathbf{S}^{-1} \\
+\mathbf{A}^{n+1} = \mathbf{A}^n\mathbf{A} =& \mathbf{SD}^n\mathbf{S}^{-1}\mathbf{SD}\mathbf{S}^{-1} \\
+                                          =& \mathbf{SD}^n\mathbf{D}\mathbf{S}^{-1} \\
+					  =& \mathbf{SD}^{n+1}\mathbf{S}^{-1} \\
+\end{align*}
+
+*** Linear Transformation
+Following from the definition of matrix multiplication, linear transformations on vectors can be represented using a matrix. For example, a vector $\mathbf{x} \in \mathbb{R}^2$ can be rotated by \theta by multiplying with a matrix to give a new vector $\mathbf{r} \in \mathbb{R}^2$. 
+\begin{equation*}
+\mathbf{r} = \begin{pmatrix}
+\cos(\theta) & -\sin(\theta) \\
+\sin(\theta) & \cos(\theta) \\
+\end{pmatrix} \mathbf{x} 
+\end{equation*}
+\begin{equation*}
+|\mathbf{x}| = |\mathbf{r}|
+\end{equation*}
+
+A special case of these linear transformations is to only scale the vector by some amount $\lambda$:
+\begin{equation*}
+\mathbf{Ax} = \lambda \mathbf{x}
+\end{equation*}
+For a matrix $\mathbf{A}$, the vectors $\mathbf{x}$ and scalars $\lambda$ which satisfy this equation are called eigen vectors and eigen values, respectively. They can be found by the following method:
+\begin{align*}
+\mathbf{Ax} =& \lambda \mathbf{x} \\
+\mathbf{Ax} - \lambda \mathbf{x} =& 0 \\
+(\mathbf{A} - \lambda\mathbf{I})\mathbf{x} =& 0
+\end{align*}
+For non-trivial results:
+\begin{align*}
+\mathrm{det}(\mathbf{A} - \lambda\mathbf{I}) = 0
+\end{align*}
+
+As another example of a linear transformation, take a vector $\mathbf{u} \in \mathbb{R}^d$ and from it construct the matrix $\mathbf{P} = \mathbf{uu}^T$.
+The first interesting property of this matrix is that multiplying it with any vector will make a vector which points in the direction of $\mathbf{u}$:
+\begin{align*}
+\mathbf{Px} = \mathbf{uu}^T\mathbf{x} = \mathbf{u}(\mathbf{u}\cdot\mathbf{x}) = \mathbf{u}a
+\end{align*}
+This works because the dot product results in a scalar (written as $a$).
+
+Another use for $\mathbf{P}$ is to construct $(2\mathbf{P} - \mathbf{I})$, which will reflect around $\mathbf{u}$:
+\begin{align*}
+(2\mathbf{P} - \mathbf{I})\mathbf{x} &= 2\mathbf{Px} - \mathbf{x} \\
+                                     &= 2\mathbf{u}(\mathbf{u}\cdot\mathbf{x}) - \mathbf{x}
+\end{align*}
+To see this, it helps to plot it.
+
+

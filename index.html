@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Machine Learning Revision</title>
-<!-- 2017-01-04 Wed 12:02 -->
+<!-- 2017-01-04 Wed 15:44 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Tom Eccles" />
@@ -134,6 +134,48 @@ for the JavaScript code in this tag.
  }
 /*]]>*///-->
 </script>
+<script type="text/javascript" src="http://orgmode.org/mathjax/MathJax.js"></script>
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+    MathJax.Hub.Config({
+        // Only one of the two following lines, depending on user settings
+        // First allows browser-native MathML display, second forces HTML/CSS
+        //  config: ["MMLorHTML.js"], jax: ["input/TeX"],
+            jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
+                     "TeX/noUndefined.js"],
+        tex2jax: {
+            inlineMath: [ ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"], ["\\begin{displaymath}","\\end{displaymath}"] ],
+            skipTags: ["script","noscript","style","textarea","pre","code"],
+            ignoreClass: "tex2jax_ignore",
+            processEscapes: false,
+            processEnvironments: true,
+            preview: "TeX"
+        },
+        showProcessingMessages: true,
+        displayAlign: "center",
+        displayIndent: "2em",
+
+        "HTML-CSS": {
+             scale: 100,
+             availableFonts: ["STIX","TeX"],
+             preferredFont: "TeX",
+             webFont: "TeX",
+             imageFont: "TeX",
+             showMathMenu: true,
+        },
+        MMLorHTML: {
+             prefer: {
+                 MSIE:    "MML",
+                 Firefox: "MML",
+                 Opera:   "HTML",
+                 other:   "HTML"
+             }
+        }
+    });
+/*]]>*///-->
+</script>
 </head>
 <body>
 <div id="content">
@@ -143,6 +185,16 @@ for the JavaScript code in this tag.
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#sec-1">1. About This Document</a></li>
+<li><a href="#sec-2">2. Maths Review</a>
+<ul>
+<li><a href="#sec-2-1">2.1. Matrices and Vectors</a>
+<ul>
+<li><a href="#sec-2-1-1">2.1.1. Basics</a></li>
+<li><a href="#sec-2-1-2">2.1.2. Linear Transformation</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -151,7 +203,7 @@ for the JavaScript code in this tag.
 <h2 id="sec-1"><span class="section-number-2">1</span> About This Document</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-This document contains my revision notes for COMP3206 Machine Learning as taught by Professor Mahesan Niranjan. This work was produced based on his lectures but any inaccuracies and misunderstandings contained herein are almost certainly my own mistake.
+This document contains my revision notes for COMP3206 Machine Learning as taught by Professor Mahesan Niranjan at the University of Southampton. This work was produced based on his lectures but any inaccuracies and misunderstandings contained herein are almost certainly my own mistake.
 </p>
 
 <p>
@@ -159,10 +211,154 @@ This document my be distributed under the terms of the <a href="https://www.gnu.
 </p>
 </div>
 </div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Maths Review</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+This section <b>very</b> briefly reviews some of the maths needed for the rest of the document.
+</p>
+</div>
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Matrices and Vectors</h3>
+<div class="outline-text-3" id="text-2-1">
+</div><div id="outline-container-sec-2-1-1" class="outline-4">
+<h4 id="sec-2-1-1"><span class="section-number-4">2.1.1</span> Basics</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<p>
+A vector: 
+</p>
+\begin{equation*}
+\mathbf{x} = \begin{pmatrix}
+x_1 \\ x_2 \\ x_3 \\ \vdots \\ x_N \end{pmatrix}
+\end{equation*}
+
+<p>
+A matrix:
+</p>
+\begin{equation*}
+\mathbf{A} = \begin{pmatrix}
+a_{11} & a_{12} & \cdots & a_{1n} \\
+a_{21} & a_{22} & \cdots & a_{2n} \\
+\vdots & \vdots & \vdots & \vdots \\
+a_{m1} & a_{m2} & \cdots & a_{mn} \\
+\end{pmatrix}
+\end{equation*}
+
+<p>
+Matrix Multiplication:
+</p>
+\begin{equation*}
+[\mathbf{A}\mathbf{B}]_{ij} = \sum_{k=1}^n A_{ik}B_{kj}
+\end{equation*}
+
+<p>
+Scalar product of vectors: (where &theta; is the angle between the vectors)
+</p>
+\begin{equation*}
+\mathbf{x} \cdot \mathbf{y} = \sum_{i = 1}^{N} x_i y_i = \mathbf{x}^T \mathbf{y} = |\mathbf{x}| |\mathbf{y}| \cos(\theta) 
+\end{equation*}
+
+<p>
+This can be used to project \(\mathbf{x}\) along the direction \(\mathbf{u}\):
+</p>
+\begin{equation*}
+\mathrm{projection} = \frac{\mathbf{x}^T \mathbf{u}}{|\mathbf{u}|}\mathbf{u}
+\end{equation*}
+
+<p>
+As an example of matrix algebra: a diagonal matrix is a scalar multiple of the identity matrix. A diagonalizable matrix can be written in erms of a diagonal matrix \(\mathbf{D}\) and some transformation matrix \(\mathbf{S}\) as follows:
+</p>
+\begin{equation*}
+\mathbf{A} = \mathbf{SDS}^{-1} = \mathbf{S}a\mathbf{IS}^{-1}
+\end{equation*}
+
+<p>
+Using this relationship, a diagonalizable matrix can be efficiently raised to a power using
+</p>
+\begin{equation*}
+\mathbf{A}^n = \mathbf{SD}^n\mathbf{S}^{-1} = \mathbf{S}a^n\mathbf{IS}^{-1}
+\end{equation*}
+
+<p>
+To prove this by induction for \(n \in \mathbb{N}\):
+</p>
+\begin{align*}
+\mathbf{A}^1 =& \mathbf{SD}^1\mathbf{S}^{-1} \\
+\mathrm{Assume } \: \mathbf{A}^n =& \mathbf{SD}^n\mathbf{S}^{-1} \\
+\mathbf{A}^{n+1} = \mathbf{A}^n\mathbf{A} =& \mathbf{SD}^n\mathbf{S}^{-1}\mathbf{SD}\mathbf{S}^{-1} \\
+                                          =& \mathbf{SD}^n\mathbf{D}\mathbf{S}^{-1} \\
+                                          =& \mathbf{SD}^{n+1}\mathbf{S}^{-1} \\
+\end{align*}
+</div>
+</div>
+
+<div id="outline-container-sec-2-1-2" class="outline-4">
+<h4 id="sec-2-1-2"><span class="section-number-4">2.1.2</span> Linear Transformation</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<p>
+Following from the definition of matrix multiplication, linear transformations on vectors can be represented using a matrix. For example, a vector \(\mathbf{x} \in \mathbb{R}^2\) can be rotated by &theta; by multiplying with a matrix to give a new vector \(\mathbf{r} \in \mathbb{R}^2\). 
+</p>
+\begin{equation*}
+\mathbf{r} = \begin{pmatrix}
+\cos(\theta) & -\sin(\theta) \\
+\sin(\theta) & \cos(\theta) \\
+\end{pmatrix} \mathbf{x} 
+\end{equation*}
+\begin{equation*}
+|\mathbf{x}| = |\mathbf{r}|
+\end{equation*}
+
+<p>
+A special case of these linear transformations is to only scale the vector by some amount \(\lambda\):
+</p>
+\begin{equation*}
+\mathbf{Ax} = \lambda \mathbf{x}
+\end{equation*}
+<p>
+For a matrix \(\mathbf{A}\), the vectors \(\mathbf{x}\) and scalars \(\lambda\) which satisfy this equation are called eigen vectors and eigen values, respectively. They can be found by the following method:
+</p>
+\begin{align*}
+\mathbf{Ax} =& \lambda \mathbf{x} \\
+\mathbf{Ax} - \lambda \mathbf{x} =& 0 \\
+(\mathbf{A} - \lambda\mathbf{I})\mathbf{x} =& 0
+\end{align*}
+<p>
+For non-trivial results:
+</p>
+\begin{align*}
+\mathrm{det}(\mathbf{A} - \lambda\mathbf{I}) = 0
+\end{align*}
+
+<p>
+As another example of a linear transformation, take a vector \(\mathbf{u} \in \mathbb{R}^d\) and from it construct the matrix \(\mathbf{P} = \mathbf{uu}^T\).
+The first interesting property of this matrix is that multiplying it with any vector will make a vector which points in the direction of \(\mathbf{u}\):
+</p>
+\begin{align*}
+\mathbf{Px} = \mathbf{uu}^T\mathbf{x} = \mathbf{u}(\mathbf{u}\cdot\mathbf{x}) = \mathbf{u}a
+\end{align*}
+<p>
+This works because the dot product results in a scalar (written as \(a\)).
+</p>
+
+<p>
+Another use for \(\mathbf{P}\) is to construct \((2\mathbf{P} - \mathbf{I})\), which will reflect around \(\mathbf{u}\):
+</p>
+\begin{align*}
+(2\mathbf{P} - \mathbf{I})\mathbf{x} &= 2\mathbf{Px} - \mathbf{x} \\
+                                     &= 2\mathbf{u}(\mathbf{u}\cdot\mathbf{x}) - \mathbf{x}
+\end{align*}
+<p>
+To see this, it helps to plot it.
+</p>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Tom Eccles</p>
-<p class="date">Created: 2017-01-04 Wed 12:02</p>
+<p class="date">Created: 2017-01-04 Wed 15:44</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.4.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
