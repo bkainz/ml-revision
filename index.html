@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Machine Learning Revision</title>
-<!-- 2017-01-05 Thu 13:47 -->
+<!-- 2017-01-05 Thu 19:17 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Tom Eccles" />
@@ -134,7 +134,7 @@ for the JavaScript code in this tag.
  }
 /*]]>*///-->
 </script>
-<script type="text/javascript" src="http://orgmode.org/mathjax/MathJax.js"></script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <script type="text/javascript">
 <!--/*--><![CDATA[/*><!--*/
     MathJax.Hub.Config({
@@ -203,6 +203,15 @@ for the JavaScript code in this tag.
 <ul>
 <li><a href="#sec-2-3-1">2.3.1. Bayes Theorem</a></li>
 <li><a href="#sec-2-3-2">2.3.2. Multivariate Gaussian</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-3">3. Supervised Learning</a>
+<ul>
+<li><a href="#sec-3-1">3.1. Classification</a>
+<ul>
+<li><a href="#sec-3-1-1">3.1.1. Bayesian Decision Theory</a></li>
 </ul>
 </li>
 </ul>
@@ -454,10 +463,10 @@ Minimise \(f(x,y)=xy\) subject to \(x^2+y^2=8\)
 &\mathbf{\nabla F}(x,y,\lambda) = \mathbf{0} \\
 &\frac{\partial F}{\partial x} = y - 2\lambda x = 0 \\
 &\frac{\partial F}{\partial y} = x - 2\lambda y = 0 \\
-&x = y \\
+&\therefore x = y \\
 &\frac{\partial F}{\partial \lambda} = x^2 + y^2 -8 = 0 \\
-&2x^2 - 8 = 0 \\
-&x = y = \pm 2
+&\therefore 2x^2 - 8 = 0 \\
+&\therefore x = y = \pm 2
 \end{align*}
 
 <p>
@@ -490,7 +499,7 @@ P[Y|X] = \frac{P[X|Y]P[Y]}{\sum_{i=1}^{N} P[X|Y_i] P[Y_i]}
 For a mean \(\mathbf{m} \in \mathbb{R}^p\) and co-variance matrix \(\mathbf{C} \in \mathbb{R}^{p \times p}\)
 </p>
 \begin{equation*}
-p(\mathbf{x}) = \frac{1}{(2\pi)^p \mathrm{det}(\mathbf{C})^{1/2}}\left(\frac{1}{2}(\mathbf{x} - \mathbf{m})^T\mathbf{C}^{-1}(\mathbf{x} - \mathbf{m})\right)
+p(\mathbf{x}) = \frac{1}{\sqrt{(2\pi)^p \mathrm{det}(\mathbf{C})}}\exp\left(-\frac{1}{2}(\mathbf{x} - \mathbf{m})^T\mathbf{C}^{-1}(\mathbf{x} - \mathbf{m})\right)
 \end{equation*}
 
 <p>
@@ -504,10 +513,121 @@ The normal (gaussian) distribution can be linearly transformed as so:
 </div>
 </div>
 </div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Supervised Learning</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Classification</h3>
+<div class="outline-text-3" id="text-3-1">
+</div><div id="outline-container-sec-3-1-1" class="outline-4">
+<h4 id="sec-3-1-1"><span class="section-number-4">3.1.1</span> Bayesian Decision Theory</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<p>
+I will only consider gaussian distributed data. This is common because of the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">Central Limit Theorem</a>. The aim is to learn the mean and co-variance for each class. Data can then be assigned to the most probable class. 
+</p>
+
+<p>
+We assume that we know the classes \(\omega_i, \, i=1,\dots,k\) and class probabilities \(P[\omega_i]\) a priori. 
+</p>
+
+<p>
+Training data tells us \(p(\mathbf{x} | \omega_i)\). 
+</p>
+
+<p>
+Formally, the decision rule is to find \(j\) such that 
+</p>
+\begin{equation*}
+\max_j \left(P[\omega_j | \mathbf{x}]\right)
+\end{equation*}
+
+<p>
+Using Bayes Theorem
+</p>
+\begin{equation*}
+P[\omega_j|\mathbf{x}] = \frac{p(\mathbf{x}|\omega_j)P[\omega_j]}{\sum_{i=1}^{k} P[\mathbf{x}|\omega_i] P[\omega_i]}
+\end{equation*}
+<p>
+The denominator is constant with respect to \(j\) and so is unimportant for the maximum. Therefore the decision rule can be simplified to
+</p>
+\begin{equation*}
+\max_j \left( p(\mathbf{x}|\omega_j)P[\omega_j] \right)
+\end{equation*}
+
+<p>
+The decision rule can be further simplified. For simplicity I will consider the two class case (\(k=2\)).
+</p>
+
+\begin{align*}
+p(\mathbf{x}|\omega_1)P[\omega_1] &\lessgtr p(\mathbf{x}|\omega_2)P[\omega_2] \\
+\frac{1}{\sqrt{(2\pi)^p\mathrm{det}(\mathbf{C_1})}}\exp\left( -\frac{1}{2}(\mathbf{x} - \mathbf{m}_1)^T\mathbf{C_1}^{-1}(\mathbf{x} - \mathbf{m}_1) \right)P[\omega_1] &\lessgtr  \frac{1}{\sqrt{(2\pi)^p\mathrm{det}(\mathbf{C_2})}}\exp\left( -\frac{1}{2}(\mathbf{x} - \mathbf{m}_2)^T\mathbf{C_2}^{-1}(\mathbf{x} - \mathbf{m}_2) \right)P[\omega_2]
+\end{align*}
+
+<p>
+From this point we can get a few different classifiers, depending upon the assumptions we make. At first I will assume that the classes share a common co-variance matrix which shows no correlation of the variables (\(\mathbf{C} \propto \mathbf{I}\)) and that the prior probabilites of each class are equal.
+</p>
+
+\begin{align*}
+(\mathbf{x} - \mathbf{m}_1)^T\mathbf{C}^{-1}(\mathbf{x} - \mathbf{m}_1) &\lessgtr (\mathbf{x} - \mathbf{m}_2)^T\mathbf{C}^{-1}(\mathbf{x} - \mathbf{m}_2) \\
+(\mathbf{x} - \mathbf{m}_1)^T(\mathbf{x} - \mathbf{m}_1) &\lessgtr (\mathbf{x} - \mathbf{m}_2)^T(\mathbf{x} - \mathbf{m}_2) \\
+|\mathbf{x} - \mathbf{m}_1| &\lessgtr |\mathbf{x} - \mathbf{m_2}|
+\end{align*}
+
+<p>
+This is a distance to mean classifier. To recap, to get to a distance to mean classifier, we had to assume that the variables were multivariate-gaussian distributed, with equal co-variance matrices with no correlation, equal prior class probabilities and distinct means.
+</p>
+
+<p>
+A slightly more general classifier can be obtained by relaxing the assumptions that the co-variance matrices have no correlation and that the prior probabilities are equal.
+</p>
+\begin{align*}
+(\mathbf{x} - \mathbf{m}_1)^T\mathbf{C}^{-1}(\mathbf{x} - \mathbf{m}_1) + \log\left(\frac{P[\omega_1]}{P[\omega_2]}\right) &\lessgtr (\mathbf{x} - \mathbf{m}_2)^T\mathbf{C}^{-1}(\mathbf{x} - \mathbf{m}_2) \\
+(\mathbf{x} - \mathbf{m}_1)^T\mathbf{C}^{-1}(\mathbf{x} - \mathbf{m}_1) -(\mathbf{x} - \mathbf{m}_2)^T\mathbf{C}^{-1}(\mathbf{x} - \mathbf{m}_2) + \log\left(\frac{P[\omega_1]}{P[\omega_2]}\right) &\lessgtr 0 \\
+\mathbf{x}^T\mathbf{C}^{-1}\mathbf{x} -2\mathbf{m_1}^T\mathbf{C}^{-1}\mathbf{x} + \mathbf{m_1}^T\mathbf{C}^{-1}\mathbf{m_1} - \mathbf{x}^T\mathbf{C}^{-1}\mathbf{x} + 2\mathbf{m_2}^T\mathbf{C}^{-1}\mathbf{x} - \mathbf{m_2}^T\mathbf{C}^{-1}\mathbf{m_2} + \log\left(\frac{P[\omega_1]}{P[\omega_2]}\right) &\lessgtr 0 \\
+2(\mathbf{m_2} - \mathbf{m_1})^{T}\mathbf{C}^{-1}\mathbf{x} + \left[  \mathbf{m_1}^T\mathbf{C}^{-1}\mathbf{m_1} - \mathbf{m_2}^T\mathbf{C}^{-1}\mathbf{m_2} + \log\left(\frac{P[\omega_1]}{P[\omega_2]}\right) \right] &\lessgtr 0 \\
+\end{align*}
+
+<p>
+This is also a linear classifier because the assumption that the co-variance matrices are the same allowed the quadratic terms to cancel. This may also be considered as a distance to template classifier (as with the distance to mean classifier) except here we are using Mahalanobis distance instead of euclidean distance.
+</p>
+
+<p>
+Relaxing that assumption (leaving only the assumption that the data are normally distributed) would lead to a quadratic classifier.
+</p>
+
+<p>
+A similar application is to calculate the posterior probability of a gaussian distributed variable: (assuming that class 1 is not impossible)
+</p>
+\begin{align*}
+P[\omega_1 | \mathbf{x}] &= \frac{p(\mathbf{x} | \omega_1)P[\omega_1]}{\sum_{i=1}^k p(\mathbf{x} | \omega_i)P[\omega_i]} \\
+                         &= \frac{1}{1 + \sum_{i=2}^k \frac{p(\mathbf{x} | \omega_i)P[\omega_i]}{p(\mathbf{x} | \omega_1)P[\omega_1]}} \\
+                         &= \frac{1}{1 + \sum_{i=2}^k \frac{P[\omega_i]\sqrt{\mathrm{det}(\mathbf{C}_1)}}{P[\omega_1]\sqrt{\mathrm{det}(\mathbf{C}_i)}}\exp\left[ (\mathbf{x} - \mathbf{m}_i)^T\mathbf{C_i}^{-1}(\mathbf{x} - \mathbf{m}_i) -(\mathbf{x} - \mathbf{m}_1)^T\mathbf{C_1}^{-1}(\mathbf{x} - \mathbf{m}_1) \right]} \\
+\end{align*}
+
+<p>
+As we saw previously, when the co-variances are equal, the exponential will be linear in \(\mathbf{x}\):
+</p>
+\begin{align*}
+P[\omega_1 | \mathbf{x}] &= \frac{1}{1 + \sum_{i=2}^k \frac{P[\omega_i]\sqrt{\mathrm{det}(\mathbf{C}_1)}}{P[\omega_1]\sqrt{\mathrm{det}(\mathbf{C}_i)}}\exp\left[\mathbf{w}^T\mathbf{x} + \mathbf{w}_0\right]} \\ 
+\end{align*}
+
+<p>
+For a two class problem, this is an obvious case of a sigmoidal function. For more classes or for a quadratic class boundary (distinct co-variance matrices), the plot still looks intuitively sigmoidal. For example, here is a 3D plot for two classes with different co-variance matrices:
+</p>
+
+<div class="figure">
+<p><img src="./posteriorProbability3D.png" alt="posteriorProbability3D.png" width="100%" />
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Tom Eccles</p>
-<p class="date">Created: 2017-01-05 Thu 13:47</p>
+<p class="date">Created: 2017-01-05 Thu 19:17</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.4.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
