@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Machine Learning Revision</title>
-<!-- 2017-01-04 Wed 15:44 -->
+<!-- 2017-01-05 Thu 13:47 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Tom Eccles" />
@@ -193,6 +193,18 @@ for the JavaScript code in this tag.
 <li><a href="#sec-2-1-2">2.1.2. Linear Transformation</a></li>
 </ul>
 </li>
+<li><a href="#sec-2-2">2.2. Calculus</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. Basics</a></li>
+<li><a href="#sec-2-2-2">2.2.2. Optimisation</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. Probability</a>
+<ul>
+<li><a href="#sec-2-3-1">2.3.1. Bayes Theorem</a></li>
+<li><a href="#sec-2-3-2">2.3.2. Multivariate Gaussian</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -354,11 +366,148 @@ To see this, it helps to plot it.
 </div>
 </div>
 </div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Calculus</h3>
+<div class="outline-text-3" id="text-2-2">
+</div><div id="outline-container-sec-2-2-1" class="outline-4">
+<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> Basics</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+For a function \(f\: : \: \mathbb{R}^N \to \mathbb{R}\) 
+</p>
+\begin{equation*}
+\mathbf{\nabla f} (\mathbf{x}) = \begin{pmatrix}
+\frac{\partial f}{\partial x_1} \\
+\frac{\partial f}{\partial x_2} \\
+\vdots \\
+\frac{\partial f}{\partial x_N} \\
+\end{pmatrix}
+\end{equation*}
+<p>
+\(\mathbf{\nabla}\) should be thought of as the vector gradient of \(f\). 
+</p>
+
+<p>
+For example, consider \(f(\mathbf{x}) := \mathbf{x}^T\mathbf{Ax}\), \(\mathbf{x} \in \mathbb{R}^2\), where \(\mathbf{A}\) is symmetric (\(A_{21} = A_{12}\))
+</p>
+\begin{align*}
+\mathbf{\nabla f} &= \begin{pmatrix}
+\frac{\partial f}{\partial x_1}\left( x_1^2A_{11} + 2x_1x_2A_{21} + x_2^2A_{22} \right) \\
+\frac{\partial f}{\partial x_2}\left( x_1^2A_{11} + 2x_1x_2A_{21} + x_2^2A_{22} \right) \\
+\end{pmatrix} \\
+&= \begin{pmatrix}
+2x_1A_{11} + 2x_2A_{21} \\
+2x_2A_{22} + 2x_1A_{21} \\
+\end{pmatrix} \\
+&= 2\mathbf{Ax}
+\end{align*}
+
+<p>
+Similarly, \(\mathbf{H}\) (the hessian matrix). This represents the local curvature of a function \(f\: : \: \mathbb{R}^N \to \mathbb{R}\) using second order partial derivatives. The hessian matrix can be defined as
+</p>
+\begin{equation*}
+H_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}
+\end{equation*}
+</div>
+</div>
+
+<div id="outline-container-sec-2-2-2" class="outline-4">
+<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> Optimisation</h4>
+<div class="outline-text-4" id="text-2-2-2">
+</div><ol class="org-ol"><li><a id="sec-2-2-2-1" name="sec-2-2-2-1"></a>Unconstrained<br  /><div class="outline-text-5" id="text-2-2-2-1">
+<p>
+For example \(\min f(\cdot)\)
+</p>
+
+<p>
+A commonly used iterative method is gradient decent:
+</p>
+\begin{equation*}
+\mathbf{x}^{(n+1)} = \mathbf{x}^{(n)} - \eta \mathbf{\nabla f(\mathbf{x})}
+\end{equation*}
+<p>
+Gradient decent is like taking the path down the gradient to the bottom of the metaphorical hill. 
+</p>
+
+<p>
+Newton's method converges faster than gradient decent but is also far more computationally intensive
+</p>
+\begin{equation*}
+\mathbf{x}^{(n+1)} = \mathbf{x}^{(n)} - \mathbf{H}^{-1}\mathbf{f(\mathbf{x})}
+\end{equation*}
+</div>
+</li>
+
+<li><a id="sec-2-2-2-2" name="sec-2-2-2-2"></a>Constrained - Lagrange Multipliers<br  /><div class="outline-text-5" id="text-2-2-2-2">
+<p>
+To minimise \(f \: : \: \mathbb{R}^n \to \mathbb{R}\) subject to conditions \(g_i \: : \mathbb{R}^{d_i} \to \mathbb{R} = 0, \: d_i\leq n, \: i = 1, 2, \dots, m\), define \(F \: : \: \mathbb{R}^{n+m} \to \mathbb{R} \: := f(\cdot) - \sum_{i=1}^{N}\lambda_i g_i(\cdot)\). The minimum (or maximum) will be at \(\mathbf{\nabla F} = \mathbf{0}\). 
+</p>
+
+<p>
+Example:
+Minimise \(f(x,y)=xy\) subject to \(x^2+y^2=8\)
+</p>
+\begin{align*}
+&g(x,y) = x^2+y^2-8 \\
+&F(x,y,\lambda) = xy - \lambda(x^2+y^2-8) \\
+&\mathbf{\nabla F}(x,y,\lambda) = \mathbf{0} \\
+&\frac{\partial F}{\partial x} = y - 2\lambda x = 0 \\
+&\frac{\partial F}{\partial y} = x - 2\lambda y = 0 \\
+&x = y \\
+&\frac{\partial F}{\partial \lambda} = x^2 + y^2 -8 = 0 \\
+&2x^2 - 8 = 0 \\
+&x = y = \pm 2
+\end{align*}
+
+<p>
+So there are minima subject to the constraint at \((2,2)\) and \((-2, -2)\).
+</p>
+</div>
+</li></ol>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> Probability</h3>
+<div class="outline-text-3" id="text-2-3">
+</div><div id="outline-container-sec-2-3-1" class="outline-4">
+<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> Bayes Theorem</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<p>
+For \(N\) classes
+</p>
+\begin{equation*}
+P[Y|X] = \frac{P[X|Y]P[Y]}{\sum_{i=1}^{N} P[X|Y_i] P[Y_i]}
+\end{equation*}
+</div>
+</div>
+
+<div id="outline-container-sec-2-3-2" class="outline-4">
+<h4 id="sec-2-3-2"><span class="section-number-4">2.3.2</span> Multivariate Gaussian</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<p>
+For a mean \(\mathbf{m} \in \mathbb{R}^p\) and co-variance matrix \(\mathbf{C} \in \mathbb{R}^{p \times p}\)
+</p>
+\begin{equation*}
+p(\mathbf{x}) = \frac{1}{(2\pi)^p \mathrm{det}(\mathbf{C})^{1/2}}\left(\frac{1}{2}(\mathbf{x} - \mathbf{m})^T\mathbf{C}^{-1}(\mathbf{x} - \mathbf{m})\right)
+\end{equation*}
+
+<p>
+The normal (gaussian) distribution can be linearly transformed as so:
+</p>
+\begin{align*}
+ \mathbf{x} \sim& \mathcal{N}(\mathbf{m}, \mathbf{C}) \\
+\mathbf{Ax} \sim& \mathcal{N}(\mathbf{Am}, \mathbf{ACA}^T)
+\end{align*}
+</div>
+</div>
+</div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Tom Eccles</p>
-<p class="date">Created: 2017-01-04 Wed 15:44</p>
+<p class="date">Created: 2017-01-05 Thu 13:47</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.4.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>

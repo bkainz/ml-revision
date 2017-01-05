@@ -102,4 +102,87 @@ Another use for $\mathbf{P}$ is to construct $(2\mathbf{P} - \mathbf{I})$, which
 \end{align*}
 To see this, it helps to plot it.
 
+** Calculus
+*** Basics
+For a function $f\: : \: \mathbb{R}^N \to \mathbb{R}$ 
+\begin{equation*}
+\mathbf{\nabla f} (\mathbf{x}) = \begin{pmatrix}
+\frac{\partial f}{\partial x_1} \\
+\frac{\partial f}{\partial x_2} \\
+\vdots \\
+\frac{\partial f}{\partial x_N} \\
+\end{pmatrix}
+\end{equation*}
+$\mathbf{\nabla}$ should be thought of as the vector gradient of $f$. 
+
+For example, consider $f(\mathbf{x}) := \mathbf{x}^T\mathbf{Ax}$, $\mathbf{x} \in \mathbb{R}^2$, where $\mathbf{A}$ is symmetric ($A_{21} = A_{12}$)
+\begin{align*}
+\mathbf{\nabla f} &= \begin{pmatrix}
+\frac{\partial f}{\partial x_1}\left( x_1^2A_{11} + 2x_1x_2A_{21} + x_2^2A_{22} \right) \\
+\frac{\partial f}{\partial x_2}\left( x_1^2A_{11} + 2x_1x_2A_{21} + x_2^2A_{22} \right) \\
+\end{pmatrix} \\
+&= \begin{pmatrix}
+2x_1A_{11} + 2x_2A_{21} \\
+2x_2A_{22} + 2x_1A_{21} \\
+\end{pmatrix} \\
+&= 2\mathbf{Ax}
+\end{align*}
+
+Similarly, $\mathbf{H}$ (the hessian matrix). This represents the local curvature of a function $f\: : \: \mathbb{R}^N \to \mathbb{R}$ using second order partial derivatives. The hessian matrix can be defined as
+\begin{equation*}
+H_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}
+\end{equation*}
+
+*** Optimisation
+**** Unconstrained
+For example $\min f(\cdot)$
+
+A commonly used iterative method is gradient decent:
+\begin{equation*}
+\mathbf{x}^{(n+1)} = \mathbf{x}^{(n)} - \eta \mathbf{\nabla f(\mathbf{x})}
+\end{equation*}
+Gradient decent is like taking the path down the gradient to the bottom of the metaphorical hill. 
+
+Newton's method converges faster than gradient decent but is also far more computationally intensive
+\begin{equation*}
+\mathbf{x}^{(n+1)} = \mathbf{x}^{(n)} - \mathbf{H}^{-1}\mathbf{f(\mathbf{x})}
+\end{equation*}
+
+**** Constrained - Lagrange Multipliers
+To minimise $f \: : \: \mathbb{R}^n \to \mathbb{R}$ subject to conditions $g_i \: : \mathbb{R}^{d_i} \to \mathbb{R} = 0, \: d_i\leq n, \: i = 1, 2, \dots, m$, define $F \: : \: \mathbb{R}^{n+m} \to \mathbb{R} \: := f(\cdot) - \sum_{i=1}^{N}\lambda_i g_i(\cdot)$. The minimum (or maximum) will be at $\mathbf{\nabla F} = \mathbf{0}$. 
+
+Example:
+Minimise $f(x,y)=xy$ subject to $x^2+y^2=8$
+\begin{align*}
+&g(x,y) = x^2+y^2-8 \\
+&F(x,y,\lambda) = xy - \lambda(x^2+y^2-8) \\
+&\mathbf{\nabla F}(x,y,\lambda) = \mathbf{0} \\
+&\frac{\partial F}{\partial x} = y - 2\lambda x = 0 \\
+&\frac{\partial F}{\partial y} = x - 2\lambda y = 0 \\
+&x = y \\
+&\frac{\partial F}{\partial \lambda} = x^2 + y^2 -8 = 0 \\
+&2x^2 - 8 = 0 \\
+&x = y = \pm 2
+\end{align*}
+
+So there are minima subject to the constraint at $(2,2)$ and $(-2, -2)$.
+
+** Probability
+*** Bayes Theorem
+For $N$ classes
+\begin{equation*}
+P[Y|X] = \frac{P[X|Y]P[Y]}{\sum_{i=1}^{N} P[X|Y_i] P[Y_i]}
+\end{equation*}
+
+*** Multivariate Gaussian
+For a mean $\mathbf{m} \in \mathbb{R}^p$ and co-variance matrix $\mathbf{C} \in \mathbb{R}^{p \times p}$
+\begin{equation*}
+p(\mathbf{x}) = \frac{1}{(2\pi)^p \mathrm{det}(\mathbf{C})^{1/2}}\left(\frac{1}{2}(\mathbf{x} - \mathbf{m})^T\mathbf{C}^{-1}(\mathbf{x} - \mathbf{m})\right)
+\end{equation*}
+
+The normal (gaussian) distribution can be linearly transformed as so:
+\begin{align*}
+ \mathbf{x} \sim& \mathcal{N}(\mathbf{m}, \mathbf{C}) \\
+\mathbf{Ax} \sim& \mathcal{N}(\mathbf{Am}, \mathbf{ACA}^T)
+\end{align*}
 
