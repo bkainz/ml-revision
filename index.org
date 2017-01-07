@@ -255,3 +255,44 @@ For a two class problem, this is an obvious case of a sigmoidal function. For mo
 #+ATTR_ORG: :width 20
 #+ATTR_HTML: :width 100%
 [[./posteriorProbability3D.png]]
+*** Fisher Linear Discriminant Analysis
+The idea behind fisher linear discriminant analysis is to project a higher dimensional problem which is hard to separate onto a lower dimensional surface which has chosen so as to maximise separability.
+#+ATTR_HTML: :width 50%
+[[./projection.jpg]]
+
+Considering the pictured problem of projecting a 2D problem onto 1D, the trick is to pick the gradient $\mathbf{\omega} \in \mathbb{R}^d$ of the line so as to create maximal separability of classes. This can be captured by the fisher ratio: (recall that the scalar product projects one vector onto another)
+\begin{equation*}
+J_F := \frac{(\mathbf{\omega}^T\mathbf{m}_1 - \mathbf{\omega}^T\mathbf{m}_2)^2}{\mathbf{\omega}^T\mathbf{C}_1\mathbf{\omega} + \mathbf{\omega}^T\mathbf{C}_2\mathbf{\omega}}
+\end{equation*}
+The fisher ratio can be thought of as the distance of the means divided by the variance on the line. Maximising this will make the points maximally separable because the means will have the greatest distance and the points will have as little spread about the mean as possible.
+
+Another way of writing $J_F$ is as a ratio of quadratic forms
+\begin{align*}
+\mathbf{S_B} :=&\, (\mathbf{m}_1 - \mathbf{m}_2)(\mathbf{m}_1-\mathbf{m}_2)^T \\
+\mathbf{S_W} :=&\, \mathbf{C}_1 + \mathbf{C}_2 \\
+\therefore J_F =&\, \frac{\mathbf{\omega}^T\mathbf{S_B}\mathbf{\omega}}{\mathbf{\omega}^T\mathbf{S_W}\mathbf{\omega}}
+\end{align*}
+
+So to maximise $J_F$:
+\begin{align*}
+\frac{\partial J_F}{\partial \mathbf{\omega}} &= \mathbf{0} \\
+                                              &= \frac{2\mathbf{S_B\omega}(\mathbf{\omega}^T\mathbf{S_W\omega}) - 2\mathbf{S_W\omega}(\mathbf{\omega}^T\mathbf{S_B\omega})}{(\mathbf{\omega}^T\mathbf{S_W\omega})^2} \\
+\end{align*}
+
+It is only the direction of $\mathbf{\omega}$ which matters so we can just combine the scalars:
+\begin{align*}
+\mathbf{S_B\omega}-\alpha_0\mathbf{S_W\omega} &= \mathbf{0} \\
+\therefore \mathbf{S_W\omega} &= \alpha\mathbf{S_B\omega} \\
+\end{align*}
+
+Note that
+\begin{equation*}
+\mathbf{S_B\omega} = (\mathbf{m}_1 - \mathbf{m}_2)(\mathbf{m}_1-\mathbf{m}_2)^T\mathbf{\omega} = (\mathbf{m}_1 - \mathbf{m}_2)\alpha_1
+\end{equation*}
+
+And so points in the same way as $\mathbf{m}_1 - \mathbf{m}_2$. From this we have an equation for $\omega$
+\begin{equation*}
+\mathbf{\omega} = \alpha_2(\mathbf{C_1} + \mathbf{C_2})^{-1}(\mathbf{m}_1 - \mathbf{m}_2)
+\end{equation*}
+
+Once projected onto this line, data should be more easily separable using Bayesian Decision Theory.

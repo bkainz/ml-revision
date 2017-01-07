@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Machine Learning Revision</title>
-<!-- 2017-01-05 Thu 19:17 -->
+<!-- 2017-01-07 Sat 12:07 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Tom Eccles" />
@@ -212,6 +212,7 @@ for the JavaScript code in this tag.
 <li><a href="#sec-3-1">3.1. Classification</a>
 <ul>
 <li><a href="#sec-3-1-1">3.1.1. Bayesian Decision Theory</a></li>
+<li><a href="#sec-3-1-2">3.1.2. Fisher Linear Discriminant Analysis</a></li>
 </ul>
 </li>
 </ul>
@@ -622,12 +623,78 @@ For a two class problem, this is an obvious case of a sigmoidal function. For mo
 </div>
 </div>
 </div>
+<div id="outline-container-sec-3-1-2" class="outline-4">
+<h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> Fisher Linear Discriminant Analysis</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<p>
+The idea behind fisher linear discriminant analysis is to project a higher dimensional problem which is hard to separate onto a lower dimensional surface which has chosen so as to maximise separability.
+</p>
+
+<div class="figure">
+<p><img src="./projection.jpg" alt="projection.jpg" width="50%" />
+</p>
+</div>
+
+<p>
+Considering the pictured problem of projecting a 2D problem onto 1D, the trick is to pick the gradient \(\mathbf{\omega} \in \mathbb{R}^d\) of the line so as to create maximal separability of classes. This can be captured by the fisher ratio: (recall that the scalar product projects one vector onto another)
+</p>
+\begin{equation*}
+J_F := \frac{(\mathbf{\omega}^T\mathbf{m}_1 - \mathbf{\omega}^T\mathbf{m}_2)^2}{\mathbf{\omega}^T\mathbf{C}_1\mathbf{\omega} + \mathbf{\omega}^T\mathbf{C}_2\mathbf{\omega}}
+\end{equation*}
+<p>
+The fisher ratio can be thought of as the distance of the means divided by the variance on the line. Maximising this will make the points maximally separable because the means will have the greatest distance and the points will have as little spread about the mean as possible.
+</p>
+
+<p>
+Another way of writing \(J_F\) is as a ratio of quadratic forms
+</p>
+\begin{align*}
+\mathbf{S_B} :=&\, (\mathbf{m}_1 - \mathbf{m}_2)(\mathbf{m}_1-\mathbf{m}_2)^T \\
+\mathbf{S_W} :=&\, \mathbf{C}_1 + \mathbf{C}_2 \\
+\therefore J_F =&\, \frac{\mathbf{\omega}^T\mathbf{S_B}\mathbf{\omega}}{\mathbf{\omega}^T\mathbf{S_W}\mathbf{\omega}}
+\end{align*}
+
+<p>
+So to maximise \(J_F\):
+</p>
+\begin{align*}
+\frac{\partial J_F}{\partial \mathbf{\omega}} &= \mathbf{0} \\
+                                              &= \frac{2\mathbf{S_B\omega}(\mathbf{\omega}^T\mathbf{S_W\omega}) - 2\mathbf{S_W\omega}(\mathbf{\omega}^T\mathbf{S_B\omega})}{(\mathbf{\omega}^T\mathbf{S_W\omega})^2} \\
+\end{align*}
+
+<p>
+It is only the direction of \(\mathbf{\omega}\) which matters so we can just combine the scalars:
+</p>
+\begin{align*}
+\mathbf{S_B\omega}-\alpha_0\mathbf{S_W\omega} &= \mathbf{0} \\
+\therefore \mathbf{S_W\omega} &= \alpha\mathbf{S_B\omega} \\
+\end{align*}
+
+<p>
+Note that
+</p>
+\begin{equation*}
+\mathbf{S_B\omega} = (\mathbf{m}_1 - \mathbf{m}_2)(\mathbf{m}_1-\mathbf{m}_2)^T\mathbf{\omega} = (\mathbf{m}_1 - \mathbf{m}_2)\alpha_1
+\end{equation*}
+
+<p>
+And so points in the same way as \(\mathbf{m}_1 - \mathbf{m}_2\). From this we have an equation for \(\omega\)
+</p>
+\begin{equation*}
+\mathbf{\omega} = \alpha_2(\mathbf{C_1} + \mathbf{C_2})^{-1}(\mathbf{m}_1 - \mathbf{m}_2)
+\end{equation*}
+
+<p>
+Once projected onto this line, data should be more easily separable using Bayesian Decision Theory.
+</p>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Tom Eccles</p>
-<p class="date">Created: 2017-01-05 Thu 19:17</p>
+<p class="date">Created: 2017-01-07 Sat 12:07</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.4.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
