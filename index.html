@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Machine Learning Revision</title>
-<!-- 2017-01-07 Sat 12:07 -->
+<!-- 2017-01-10 Tue 10:17 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Tom Eccles" />
@@ -209,10 +209,16 @@ for the JavaScript code in this tag.
 </li>
 <li><a href="#sec-3">3. Supervised Learning</a>
 <ul>
-<li><a href="#sec-3-1">3.1. Classification</a>
+<li><a href="#sec-3-1">3.1. Function Approximation</a>
 <ul>
-<li><a href="#sec-3-1-1">3.1.1. Bayesian Decision Theory</a></li>
-<li><a href="#sec-3-1-2">3.1.2. Fisher Linear Discriminant Analysis</a></li>
+<li><a href="#sec-3-1-1">3.1.1. Linear Regression</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-2">3.2. Classification</a>
+<ul>
+<li><a href="#sec-3-2-1">3.2.1. Bayesian Decision Theory</a></li>
+<li><a href="#sec-3-2-2">3.2.2. Fisher Linear Discriminant Analysis</a></li>
+<li><a href="#sec-3-2-3">3.2.3. Perceptron</a></li>
 </ul>
 </li>
 </ul>
@@ -225,7 +231,7 @@ for the JavaScript code in this tag.
 <h2 id="sec-1"><span class="section-number-2">1</span> About This Document</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-This document contains my revision notes for COMP3206 Machine Learning as taught by Professor Mahesan Niranjan at the University of Southampton. This work was produced based on his lectures but any inaccuracies and misunderstandings contained herein are almost certainly my own mistake.
+This document contains my revision notes for COMP3206 Machine Learning as taught by Professor Mahesan Niranjan at the University of Southampton. This work was produced based on his lectures but any inaccuracies and misunderstandings contained herein are almost certainly my own mistake. This does not represent the whole module, only what I expect to find on the exam.
 </p>
 
 <p>
@@ -519,11 +525,141 @@ The normal (gaussian) distribution can be linearly transformed as so:
 <h2 id="sec-3"><span class="section-number-2">3</span> Supervised Learning</h2>
 <div class="outline-text-2" id="text-3">
 </div><div id="outline-container-sec-3-1" class="outline-3">
-<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Classification</h3>
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Function Approximation</h3>
 <div class="outline-text-3" id="text-3-1">
 </div><div id="outline-container-sec-3-1-1" class="outline-4">
-<h4 id="sec-3-1-1"><span class="section-number-4">3.1.1</span> Bayesian Decision Theory</h4>
+<h4 id="sec-3-1-1"><span class="section-number-4">3.1.1</span> Linear Regression</h4>
 <div class="outline-text-4" id="text-3-1-1">
+<p>
+Multivariate linear regression is concerned with learning a function \(f \: : \: \mathbb{R}^p \to \mathbb{R}\) such that the function predicts some useful variable from the inputs. For example, predicting housing prices from the size of the house and it's distance from a school. 
+</p>
+
+<p>
+In linear regression we use a function of the form
+</p>
+\begin{equation*}
+f(\mathbf{x}) := \mathbf{w}^T\mathbf{x} + w_0
+\end{equation*}
+
+<p>
+For convenience we will work in \(p+1\) dimensional space:
+</p>
+\begin{align*}
+&\mathbf{y} = (\mathbf{x} \quad 1)^T \\
+&\mathbf{a} = (\mathbf{w} \quad w_0)^T \\
+&f = \mathbf{y}^T\mathbf{a} \\
+\end{align*}
+
+<p>
+The function \(f\) forms our model, we have some training data \(\{\mathbf{y}_n, f_n\}_{n=1}^N\) and from it we are trying to learn \(\mathbf{a}\). Alternately, the inputs and outputs can also be written as \(\mathbf{Y}\): an \(N\times(p+1)\) matrix in which the n<sup>th</sup> row is \(\mathbf{y}_n^T\) and \(\mathbf{f}\): an \(N\)-dimensional vector of the outputs.
+</p>
+
+<p>
+To learn \(\mathbf{a}\), construct a squared distance error function:
+</p>
+\begin{equation*}
+E = \sum_{n=1}^N (\mathbf{y}_n^T\mathbf{a} - f_n)^2 = |\mathbf{Ya}-\mathbf{f}|^2
+\end{equation*}
+
+<p>
+The error function should be minimised with respect to \(\mathbf{a}\).
+</p>
+</div>
+
+<ol class="org-ol"><li><a id="sec-3-1-1-1" name="sec-3-1-1-1"></a>Analytic Solution<br  /><div class="outline-text-5" id="text-3-1-1-1">
+<p>
+As \(E\) is quadratic in \(\mathbf{a}\) and positive valued, we can be sure that the one turning point will be the global minimum. 
+</p>
+
+<p>
+To find this turning point, equate the differential of \(E\) with respect to \(\mathbf{a}\) to zero.
+</p>
+\begin{align*}
+\mathbf{\nabla_a} E &= 0 \\
+                    &= 2\mathbf{Y}^T(\mathbf{Ya} - \mathbf{f}) \\
+\therefore \mathbf{Y}^T\mathbf{Ya} &= \mathbf{Y}^T\mathbf{f} \\
+\therefore              \mathbf{a} &= (\mathbf{Y}^T\mathbf{Y})^{-1}\mathbf{Y}^T\mathbf{f} \\
+\end{align*}
+
+<p>
+The problem with this solution is that matrix inversion is an \(O(n^3)\) problem and the dataset used to construct \(\mathbf{Y}\) will typically be very large.
+</p>
+</div>
+</li>
+
+<li><a id="sec-3-1-1-2" name="sec-3-1-1-2"></a>Gradient Decent<br  /><div class="outline-text-5" id="text-3-1-1-2">
+<p>
+A less computationally expensive method is to use gradient decent: 
+</p>
+
+<pre class="example">
+Initialise a randomly
+Update a[k+1] = a[k] - eta*dE(a)
+Until Convergence
+</pre>
+
+<p>
+Where \(\mathrm{dE}\) is \(\mathbf{\nabla_a}E\) and eta is a small scalar (increasing \(\eta\) leads to faster convergence up to a point, after which the function may not converge at all, decreasing \(\eta\) is slower but is more likely to find the minimum).
+</p>
+</div>
+</li>
+
+<li><a id="sec-3-1-1-3" name="sec-3-1-1-3"></a>Newton's Method<br  /><div class="outline-text-5" id="text-3-1-1-3">
+<p>
+The solution can also be found using Newton's method. Newton's method will converge a lot faster than gradient decent but computing and inverting \(\mathbf{H}\) could be computationally expensive.
+</p>
+
+<pre class="example">
+Initialise a randomly
+Update a[k+1] = a[k] - eta*invHdE(a)
+Until Convergence
+</pre>
+
+<p>
+Where \(\mathrm{invHdE}\) is \(\mathbf{H}^{-1}\mathbf{\nabla_a}E\).
+</p>
+</div>
+</li>
+
+<li><a id="sec-3-1-1-4" name="sec-3-1-1-4"></a>Regularisation<br  /><div class="outline-text-5" id="text-3-1-1-4">
+<p>
+The problem of finding \(\mathbf{a}\) my not have a unique solution: it may not be a well-posed problem. Therefore, it is helpful to apply regularisation to constrain the solution. One way of doing this is by using a quadratic regulariser.
+</p>
+
+<p>
+The quadratic regulariser works by adding an additional term to the error function to constrain the magnitude of \(\mathbf{a}\):
+</p>
+\begin{equation*}
+E = |\mathbf{Ya}-\mathbf{f}|^2 + \gamma|\mathbf{a}|^2
+\end{equation*}
+<p>
+Where \(\gamma\) is a small scalar which controls the trade off between regularisation and fitting the training set.
+</p>
+
+<p>
+This can then be fed into each solution method we have seen so far. For example the analytical can be obtained as follows:
+</p>
+\begin{align*}
+\mathbf{\nabla_a}E &= 0 \\
+                   &= 2\mathbf{Y}^T(\mathbf{Ya}-\mathbf{f})+2\gamma\mathbf{Ia} \\
+(\mathbf{Y}^T\mathbf{Y} + \gamma\mathbf{I})\mathbf{a} &= \mathbf{Y}^T\mathbf{f} \\
+\therefore \mathbf{a} &= (\mathbf{Y}^T\mathbf{Y}+\gamma\mathbf{I})^{-1}\mathbf{Y}^T\mathbf{f} \\
+\end{align*}
+
+<p>
+This regularisation may lead to \(\mathbf{a}\) being a sparse matrix. This indicates which variables are actually important.
+</p>
+</div>
+</li></ol>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Classification</h3>
+<div class="outline-text-3" id="text-3-2">
+</div><div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1"><span class="section-number-4">3.2.1</span> Bayesian Decision Theory</h4>
+<div class="outline-text-4" id="text-3-2-1">
 <p>
 I will only consider gaussian distributed data. This is common because of the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">Central Limit Theorem</a>. The aim is to learn the mean and co-variance for each class. Data can then be assigned to the most probable class. 
 </p>
@@ -623,9 +759,9 @@ For a two class problem, this is an obvious case of a sigmoidal function. For mo
 </div>
 </div>
 </div>
-<div id="outline-container-sec-3-1-2" class="outline-4">
-<h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> Fisher Linear Discriminant Analysis</h4>
-<div class="outline-text-4" id="text-3-1-2">
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> Fisher Linear Discriminant Analysis</h4>
+<div class="outline-text-4" id="text-3-2-2">
 <p>
 The idea behind fisher linear discriminant analysis is to project a higher dimensional problem which is hard to separate onto a lower dimensional surface which has chosen so as to maximise separability.
 </p>
@@ -689,13 +825,57 @@ Once projected onto this line, data should be more easily separable using Bayesi
 </p>
 </div>
 </div>
+<div id="outline-container-sec-3-2-3" class="outline-4">
+<h4 id="sec-3-2-3"><span class="section-number-4">3.2.3</span> Perceptron</h4>
+<div class="outline-text-4" id="text-3-2-3">
+<p>
+Perceptron follows a similar process to linear regression except the output is discrete: \(f \: : \: \mathbb{R}^p \to \{1, -1\}\). Our model is 
+</p>
+\begin{equation*}
+f(\mathbf{x}) := 
+\begin{cases}
++1 & \mathbf{w}^T\mathbf{x} + w_0 \geq 0 \\
+-1 & \mathbf{w}^T\mathbf{x} + w_0 < 0
+\end{cases}
+\end{equation*}
+
+<p>
+Note that the output when the model gives zero is arbitrary.
+</p>
+
+<p>
+As with linear regression we will use \(\mathbf{w}^T\mathbf{x} + w_0 \equiv \mathbf{y}^T\mathbf{a}\).
+</p>
+
+<p>
+The intuitive choice for an error function is to count the number of missclassifications. However, this would create an function which steps discretely (looking like stairs). This is piecewise constant and so cannot be differentiated and so is hard too minimise. Instead we will use the the sum of function outputs across the set of unclassified items \(\mathbb{U}\).
+</p>
+\begin{equation*}
+E = -\sum_{\mathbb{y}_n \in \mathbb{U}}\mathbf{y}_n^T\mathbf{a}
+\end{equation*}
+
+<p>
+This may then be minimised using stochastic gradient decent. First the derivative: 
+</p>
+\begin{equation*}
+\mathbf{\nabla_a}E = -\sum_{\mathbb{y}_n \in \mathbb{U}}\mathbf{y}_n
+\end{equation*}
+
+<p>
+Therefore, using randomly chosen \(\mathbf{y}_n\) we can update like this
+</p>
+\begin{equation*}
+\mathbf{a}^{(k+1)} = \mathbf{a}^{(k)} + \mathbf{y}_n
+\end{equation*}
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Tom Eccles</p>
-<p class="date">Created: 2017-01-07 Sat 12:07</p>
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.4.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="date">Created: 2017-01-10 Tue 10:17</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.5.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
