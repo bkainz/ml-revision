@@ -403,3 +403,43 @@ Therefore, using randomly chosen $\mathbf{y}_n$ we can update like this
 \begin{equation*}
 \mathbf{a}^{(k+1)} = \mathbf{a}^{(k)} + \mathbf{y}_n
 \end{equation*}
+** Estimation
+I will not discuss Baysean estimation.
+
+Estimation is about working out the parameters used in probability distributions. When looking at a datum we consider how probable (likely) it is. We can consider the probability as parameterised by the things we are trying to estimate. For example, the probability of gaussian-distributed data is parameterised by it's mean and variance (we will not consider multivariate parameter estimation). In notation, for data $x$ parameterised by $\mathbf{\theta}$; we say that the likelihood is $p(x|\mathbf{\theta})$.
+
+For a dataset $\mathbb{D} = \{x_i\}, \: i = 1, 2, \dots, N$, we assume that the events are independent:
+\begin{equation*}
+p(\mathbb{D}|\mathbf{\theta}) = \prod_{x_i \in \mathbb{D}} p(x_i|\mathbf{\theta})
+\end{equation*}
+
+To find the most likely parameters, we will maximise the likelihood of the whole dataset with respect to $\mathbf{\theta}$. To do this we will use the logarithm of the likelihood because this turns the product into a sum: therefore making the differentiation easier.
+\begin{equation*}
+l(\mathbf{\theta}) := \ln\left( p(\mathbb{D} | \mathbf{\theta}) \right)
+\end{equation*}
+So we are trying to work out $\hat{\mathbf{\theta}} = \mathrm{arg} \, \max_{\mathbf{\theta}} \, l(\mathbf{\theta})$.
+
+As always, this means differentiating and setting it equal to zero:
+\begin{equation*}
+\mathbf{\nabla_\theta}l = \mathbf{\nabla_\theta}\left( \sum_{x_i \in \mathbb{D}}\ln\left[  p(x_i|\mathbf{\theta}) \right] \right) = \mathbf{0}
+\end{equation*}
+
+*** Example - Univariate Gaussian Data
+So substituting in using $\theta_1 = m$ and $\theta_2 = \sigma^2$
+\begin{equation*}
+\mathbf{\nabla_\theta}l = \mathbf{\nabla_\theta}\left( \sum_{x_i \in \mathbb{D}}\left[ \frac{1}{2}\ln(2\pi\theta_2)-\frac{1}{2\theta_2}(x_i-\theta_1)^2 \right]\right) = \mathbf{0}
+\end{equation*}
+
+Therefore
+\begin{equation*}
+\begin{pmatrix}
+\sum_{x_i \in \mathbb{D}}\frac{1}{\hat{\theta_2}}(x_i - \hat{\theta_1}) \\
+\sum_{x_i \in \mathbb{D}}\left[ \frac{-1}{2\hat{\theta_2}} + \frac{1}{\hat{\theta_2}^2}\left( x_j - \hat{\theta_1} \right)^2\right] \\
+\end{pmatrix} = \begin{pmatrix} 0 \\ 0 \end{pmatrix}
+\end{equation*}
+
+After some algebra
+\begin{align*}
+\hat{m} = \hat{\theta_1} &= \frac{1}{N}\sum_{x_i \in \mathbb{D}}x_i \\
+\hat{\sigma^2} = \hat{\theta_2} &= \frac{1}{N}\sum_{x_i \in \mathbb{D}}\left(x_i - \hat{m}\right)^2
+\end{align*}

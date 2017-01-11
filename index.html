@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Machine Learning Revision</title>
-<!-- 2017-01-10 Tue 10:17 -->
+<!-- 2017-01-11 Wed 10:45 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Tom Eccles" />
@@ -219,6 +219,11 @@ for the JavaScript code in this tag.
 <li><a href="#sec-3-2-1">3.2.1. Bayesian Decision Theory</a></li>
 <li><a href="#sec-3-2-2">3.2.2. Fisher Linear Discriminant Analysis</a></li>
 <li><a href="#sec-3-2-3">3.2.3. Perceptron</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-3">3.3. Estimation</a>
+<ul>
+<li><a href="#sec-3-3-1">3.3.1. Example - Univariate Gaussian Data</a></li>
 </ul>
 </li>
 </ul>
@@ -870,12 +875,78 @@ Therefore, using randomly chosen \(\mathbf{y}_n\) we can update like this
 </div>
 </div>
 </div>
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> Estimation</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+I will not discuss Baysean estimation.
+</p>
+
+<p>
+Estimation is about working out the parameters used in probability distributions. When looking at a datum we consider how probable (likely) it is. We can consider the probability as parameterised by the things we are trying to estimate. For example, the probability of gaussian-distributed data is parameterised by it's mean and variance (we will not consider multivariate parameter estimation). In notation, for data \(x\) parameterised by \(\mathbf{\theta}\); we say that the likelihood is \(p(x|\mathbf{\theta})\).
+</p>
+
+<p>
+For a dataset \(\mathbb{D} = \{x_i\}, \: i = 1, 2, \dots, N\), we assume that the events are independent:
+</p>
+\begin{equation*}
+p(\mathbb{D}|\mathbf{\theta}) = \prod_{x_i \in \mathbb{D}} p(x_i|\mathbf{\theta})
+\end{equation*}
+
+<p>
+To find the most likely parameters, we will maximise the likelihood of the whole dataset with respect to \(\mathbf{\theta}\). To do this we will use the logarithm of the likelihood because this turns the product into a sum: therefore making the differentiation easier.
+</p>
+\begin{equation*}
+l(\mathbf{\theta}) := \ln\left( p(\mathbb{D} | \mathbf{\theta}) \right)
+\end{equation*}
+<p>
+So we are trying to work out \(\hat{\mathbf{\theta}} = \mathrm{arg} \, \max_{\mathbf{\theta}} \, l(\mathbf{\theta})\).
+</p>
+
+<p>
+As always, this means differentiating and setting it equal to zero:
+</p>
+\begin{equation*}
+\mathbf{\nabla_\theta}l = \mathbf{\nabla_\theta}\left( \sum_{x_i \in \mathbb{D}}\ln\left[  p(x_i|\mathbf{\theta}) \right] \right) = \mathbf{0}
+\end{equation*}
+</div>
+
+<div id="outline-container-sec-3-3-1" class="outline-4">
+<h4 id="sec-3-3-1"><span class="section-number-4">3.3.1</span> Example - Univariate Gaussian Data</h4>
+<div class="outline-text-4" id="text-3-3-1">
+<p>
+So substituting in using \(\theta_1 = m\) and \(\theta_2 = \sigma^2\)
+</p>
+\begin{equation*}
+\mathbf{\nabla_\theta}l = \mathbf{\nabla_\theta}\left( \sum_{x_i \in \mathbb{D}}\left[ \frac{1}{2}\ln(2\pi\theta_2)-\frac{1}{2\theta_2}(x_i-\theta_1)^2 \right]\right) = \mathbf{0}
+\end{equation*}
+
+<p>
+Therefore
+</p>
+\begin{equation*}
+\begin{pmatrix}
+\sum_{x_i \in \mathbb{D}}\frac{1}{\hat{\theta_2}}(x_i - \hat{\theta_1}) \\
+\sum_{x_i \in \mathbb{D}}\left[ \frac{-1}{2\hat{\theta_2}} + \frac{1}{\hat{\theta_2}^2}\left( x_j - \hat{\theta_1} \right)^2\right] \\
+\end{pmatrix} = \begin{pmatrix} 0 \\ 0 \end{pmatrix}
+\end{equation*}
+
+<p>
+After some algebra
+</p>
+\begin{align*}
+\hat{m} = \hat{\theta_1} &= \frac{1}{N}\sum_{x_i \in \mathbb{D}}x_i \\
+\hat{\sigma^2} = \hat{\theta_2} &= \frac{1}{N}\sum_{x_i \in \mathbb{D}}\left(x_i - \hat{m}\right)^2
+\end{align*}
+</div>
+</div>
+</div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Tom Eccles</p>
-<p class="date">Created: 2017-01-10 Tue 10:17</p>
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.5.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="date">Created: 2017-01-11 Wed 10:45</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.4.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
