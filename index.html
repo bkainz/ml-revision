@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Machine Learning Revision</title>
-<!-- 2017-01-11 Wed 10:45 -->
+<!-- 2017-01-12 Thu 16:48 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Tom Eccles" />
@@ -224,6 +224,17 @@ for the JavaScript code in this tag.
 <li><a href="#sec-3-3">3.3. Estimation</a>
 <ul>
 <li><a href="#sec-3-3-1">3.3.1. Example - Univariate Gaussian Data</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-4">4. Unsupervised Learning</a>
+<ul>
+<li><a href="#sec-4-1">4.1. Principle Component Analysis</a></li>
+<li><a href="#sec-4-2">4.2. Clustering</a>
+<ul>
+<li><a href="#sec-4-2-1">4.2.1. Expectation Maximisation (EM)</a></li>
+<li><a href="#sec-4-2-2">4.2.2. K-Means</a></li>
 </ul>
 </li>
 </ul>
@@ -942,11 +953,116 @@ After some algebra
 </div>
 </div>
 </div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Unsupervised Learning</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> Principle Component Analysis</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+Principle component analysis reduces the dimensionality of data. This can be useful for compression. 
+</p>
+
+<p>
+Let there be N items of data \(\mathbf{x}_n \in \mathbb{R}^d\) with mean \(\mathbf{m}\) and covariance \(\mathbf{C}\). We will project the data into the direction \(\mathbf{u}\). To maximise the amount of data represented in the projection, we want the highest variance possible in the projection. To optimise this we need a constraint on \(\mathbf{u}\) as the problem does not specify it's magnitude. As the magnitude of \(\mathbf{u}\) is unimportant, I will set it to 1.
+</p>
+
+<p>
+Therefore the optimisation problem can be set up as follows:
+</p>
+\begin{equation*}
+\max_\mathbf{u} \: \mathbf{u}^T\mathbf{C}\mathbf{u} \quad \mathrm{subject\: to} \: \mathbf{u}\cdot\mathbf{u} = 1
+\end{equation*}
+
+<p>
+As a lagrange multiplier problem
+</p>
+\begin{align*}
+\mathbf{\nabla}\mathcal{L} &= \mathbf{\nabla}\left\{\mathbf{u}^T\mathbf{Cu} - \lambda(\mathbf{u}^T\mathbf{u} - 1)\right\} = \mathbf{0} \\
+\therefore \frac{\partial \mathcal{L}}{\partial \mathbf{u}} &= 2\mathbf{Cu}-2\lambda(\mathbf{u}-1) = \mathbf{0} \\
+\therefore \mathbf{Cu} &= \lambda\mathbf{u}
+\end{align*}
+
+<p>
+So the solutions to the principle component values problem are the eigen vectors of \(\mathbf{C}\).
+</p>
+</div>
+</div>
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> Clustering</h3>
+<div class="outline-text-3" id="text-4-2">
+</div><div id="outline-container-sec-4-2-1" class="outline-4">
+<h4 id="sec-4-2-1"><span class="section-number-4">4.2.1</span> Expectation Maximisation (EM)</h4>
+<div class="outline-text-4" id="text-4-2-1">
+<p>
+Assuming we have some prior knowledge of the number of classes we expect, \(K\), we would intuitively expect data to be in a \(K\)-modal distribution (as usual we are using the normal distribution):
+</p>
+\begin{equation*}
+p(\mathbf{x}) = \sum_{k=1}^K\pi_k\mathcal{N}(\mathbf{m}_k, \mathbf{C}_k)
+\end{equation*}
+<p>
+The \(\pi_k\) parameters can be thought of as the prior probabilities of each class (mode).
+</p>
+
+<p>
+The aim of this algorithm is to find \(z_{nk}\): associating n<sup>th</sup> data to k<sup>th</sup> class. This can be decided by comparing the probabilities of data belonging to each class.
+</p>
+
+<p>
+For parameter estimation we have to estimate \(\pi_k\), \(\mathbf{m}_k\) and \(\mathbf{C}_k\). The algebra for this is hard. Ultimately, \(\pi_k\), \(\mathbf{m}_k\) and \(\mathbf{C}_k\) become parameterised by \(q_{nk}\), which can be interpreted as the probability that a point \(n\) is in cluster \(k\).
+</p>
+
+<p>
+A useful example is the result for \(\mathbf{m}_k\):
+</p>
+\begin{equation*}
+\mathbf{m}_k = \frac{\sum_{n=1}^Nq_{nk}\mathbf{x}_n}{\sum_{n=1}^Nq_{nk}}
+\end{equation*}
+<p>
+Here the contribution of point \(\mathbf{x}_n\) to the mean of a cluster is weighted by the probability that the point is in that cluster.
+</p>
+
+<p>
+The formula for \(q_{nk}\) is also worth commenting upon
+</p>
+\begin{equation*}
+q_{nk} = \frac{\pi_kp(\mathbf{x}_n|\mathbf{m}_k, \mathbf{C}_k)}{\sum_{j=1}^K\pi_jp(\mathbf{x}_n|\mathbf{m}_j, \mathbf{C}_j)}
+\end{equation*}
+<p>
+This is interesting because it is Bayes formula for \(p(z_{nk}=1|\mathbf{x}_n, \pi_k, \mathbf{m}_k, \mathbf{C}_k)\).
+</p>
+
+<p>
+As the estimated parameters and \(q_{nk}\) depend upon each-other, EM must be solved itteritively. One way to do this is to pick \(q_{nk}\) by considering the distance to means and then to use these to compute the other parameters.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2-2" class="outline-4">
+<h4 id="sec-4-2-2"><span class="section-number-4">4.2.2</span> K-Means</h4>
+<div class="outline-text-4" id="text-4-2-2">
+<p>
+The K-Means algorithm on input \(\mathbf{X} = {\mathbf{x}_n^T}_{n=1}^N,\:K\) outputs a vector of mode centres \(\mathbf{C}\) and \(\mathrm{Idx}\), a vector containing the class assigned to each data point.
+</p>
+<pre class="example">
+repeat
+    assign n'th sample to the nearest centre
+    recompute centres by averaging all the points assigned to them
+until no change in the centres
+</pre>
+
+<p>
+K-means can be derived from EM by setting q<sub>nk</sub> to 1 for only the largest q<sub>nk</sub> over each k and the other cells to 0. Therefore the re-estimation of \(\mathbf{m}_k\) and \(\mathbf{C}_k\) become maximum likelihood estimates. K-means should be thouht of as like EM except data are either in one class or another: nothing probabilistic. Also, standard k-means does not use covariance matrices.
+</p>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Tom Eccles</p>
-<p class="date">Created: 2017-01-11 Wed 10:45</p>
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.4.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="date">Created: 2017-01-12 Thu 16:48</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.5.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

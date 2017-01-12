@@ -443,3 +443,58 @@ After some algebra
 \hat{m} = \hat{\theta_1} &= \frac{1}{N}\sum_{x_i \in \mathbb{D}}x_i \\
 \hat{\sigma^2} = \hat{\theta_2} &= \frac{1}{N}\sum_{x_i \in \mathbb{D}}\left(x_i - \hat{m}\right)^2
 \end{align*}
+* Unsupervised Learning
+** Principle Component Analysis
+Principle component analysis reduces the dimensionality of data. This can be useful for compression. 
+
+Let there be N items of data $\mathbf{x}_n \in \mathbb{R}^d$ with mean $\mathbf{m}$ and covariance $\mathbf{C}$. We will project the data into the direction $\mathbf{u}$. To maximise the amount of data represented in the projection, we want the highest variance possible in the projection. To optimise this we need a constraint on $\mathbf{u}$ as the problem does not specify it's magnitude. As the magnitude of $\mathbf{u}$ is unimportant, I will set it to 1.
+
+Therefore the optimisation problem can be set up as follows:
+\begin{equation*}
+\max_\mathbf{u} \: \mathbf{u}^T\mathbf{C}\mathbf{u} \quad \mathrm{subject\: to} \: \mathbf{u}\cdot\mathbf{u} = 1
+\end{equation*}
+
+As a lagrange multiplier problem
+\begin{align*}
+\mathbf{\nabla}\mathcal{L} &= \mathbf{\nabla}\left\{\mathbf{u}^T\mathbf{Cu} - \lambda(\mathbf{u}^T\mathbf{u} - 1)\right\} = \mathbf{0} \\
+\therefore \frac{\partial \mathcal{L}}{\partial \mathbf{u}} &= 2\mathbf{Cu}-2\lambda(\mathbf{u}-1) = \mathbf{0} \\
+\therefore \mathbf{Cu} &= \lambda\mathbf{u}
+\end{align*}
+
+So the solutions to the principle component values problem are the eigen vectors of $\mathbf{C}$.
+** Clustering
+*** Expectation Maximisation (EM)
+Assuming we have some prior knowledge of the number of classes we expect, $K$, we would intuitively expect data to be in a $K$-modal distribution (as usual we are using the normal distribution):
+\begin{equation*}
+p(\mathbf{x}) = \sum_{k=1}^K\pi_k\mathcal{N}(\mathbf{m}_k, \mathbf{C}_k)
+\end{equation*}
+The $\pi_k$ parameters can be thought of as the prior probabilities of each class (mode).
+
+The aim of this algorithm is to find $z_{nk}$: associating n^{th} data to k^{th} class. This can be decided by comparing the probabilities of data belonging to each class.
+
+For parameter estimation we have to estimate $\pi_k$, $\mathbf{m}_k$ and $\mathbf{C}_k$. The algebra for this is hard. Ultimately, $\pi_k$, $\mathbf{m}_k$ and $\mathbf{C}_k$ become parameterised by $q_{nk}$, which can be interpreted as the probability that a point $n$ is in cluster $k$.
+
+A useful example is the result for $\mathbf{m}_k$:
+\begin{equation*}
+\mathbf{m}_k = \frac{\sum_{n=1}^Nq_{nk}\mathbf{x}_n}{\sum_{n=1}^Nq_{nk}}
+\end{equation*}
+Here the contribution of point $\mathbf{x}_n$ to the mean of a cluster is weighted by the probability that the point is in that cluster.
+
+The formula for $q_{nk}$ is also worth commenting upon
+\begin{equation*}
+q_{nk} = \frac{\pi_kp(\mathbf{x}_n|\mathbf{m}_k, \mathbf{C}_k)}{\sum_{j=1}^K\pi_jp(\mathbf{x}_n|\mathbf{m}_j, \mathbf{C}_j)}
+\end{equation*}
+This is interesting because it is Bayes formula for $p(z_{nk}=1|\mathbf{x}_n, \pi_k, \mathbf{m}_k, \mathbf{C}_k)$.
+
+As the estimated parameters and $q_{nk}$ depend upon each-other, EM must be solved itteritively. One way to do this is to pick $q_{nk}$ by considering the distance to means and then to use these to compute the other parameters.
+
+*** K-Means
+The K-Means algorithm on input $\mathbf{X} = {\mathbf{x}_n^T}_{n=1}^N,\:K$ outputs a vector of mode centres $\mathbf{C}$ and $\mathrm{Idx}$, a vector containing the class assigned to each data point.
+#+BEGIN_SRC
+repeat
+    assign n'th sample to the nearest centre
+    recompute centres by averaging all the points assigned to them
+until no change in the centres
+#+END_SRC
+
+K-means can be derived from EM by setting q_{nk} to 1 for only the largest q_{nk} over each k and the other cells to 0. Therefore the re-estimation of $\mathbf{m}_k$ and $\mathbf{C}_k$ become maximum likelihood estimates. K-means should be thouht of as like EM except data are either in one class or another: nothing probabilistic. Also, standard k-means does not use covariance matrices.
