@@ -6,7 +6,7 @@
 * About This Document
 This document contains my revision notes for COMP3206 Machine Learning as taught by Professor Mahesan Niranjan at the University of Southampton. This work was produced based on his lectures but any inaccuracies and misunderstandings contained herein are almost certainly my own mistake. This does not represent the whole module, only what I expect to find on the exam.
 
-This document my be distributed under the terms of the [[https://www.gnu.org/licenses/fdl.html][GNU Free Documentation Licence]]. A copy of the licence can be found [[https://www.gnu.org/licenses/fdl-1.3-standalone.html][here]].
+This document may be distributed under the terms of the [[https://www.gnu.org/licenses/fdl.html][GNU Free Documentation Licence]]. A copy of the licence can be found [[https://www.gnu.org/licenses/fdl-1.3-standalone.html][here]].
 * Maths Review
 This section *very* briefly reviews some of the maths needed for the rest of the document.
 
@@ -266,6 +266,42 @@ This can then be fed into each solution method we have seen so far. For example 
 \end{align*}
 
 This regularisation may lead to $\mathbf{a}$ being a sparse matrix. This indicates which variables are actually important.
+
+*** Radial Basis Functions
+Radial basis functions allow for the approximation of some non-linear functions. This is done by approximating some function $g(\cdot) \: : \: \mathbb{R}^d \to \mathbb{R}$ using a weighted sum of basis functions $\phi(\cdot) \: : \: \mathbb{R} \to \mathbb{R}$. This is similar to the Fourier transform where signals are expressed as the weighted sum of sine wave basis functions.
+\begin{equation*}
+g(\mathbf{x}) = \sum_{j=1}^M\lambda_j\phi(||\mathbf{x} - \mathbf{m}_j||/\sigma)
+\end{equation*}
+Where $\mathbf{m}_j$ are centres in the input space and $\sigma$ is a scaling factor. $M$, $\phi(\cdot)$, $\mathbf{m}_j$ and $\sigma$ are fixed by some out of band method. For example one might use a clustering algorithm to find $M$ and $\mathbf{m}_j$ and knowledge about the particular problem to choose $\phi(\cdot)$ and $\sigma$.
+
+One common choice for the basis function $\phi(\cdot)$ is a gaussian:
+\begin{equation*}
+\phi(\alpha) = \exp\left( -\frac{\alpha^2}{\sigma^2} \right)
+\end{equation*}
+
+This leaves the estimation of $\mathbf{\lambda} := \{\lambda_j\}_{j=1}^M$ as the learning problem. 
+
+For data $\{\mathbf{x}_n\}_{n=1}^N$ with labels $\{f_n\}_{n=1}^N$ we can define the matrix $\mathbf{Y}$ as
+\begin{equation*}
+\mathbf{Y} := \begin{pmatrix}
+\phi(||\mathbf{x}_1 - \mathbf{m}_1||/\sigma) & \phi(||\mathbf{x}_1 - \mathbf{m}_2||/\sigma) & \cdots & \phi(||\mathbf{x}_1 - \mathbf{m}_M||/\sigma) \\
+\phi(||\mathbf{x}_2 - \mathbf{m}_1||/\sigma) & \cdots  & \cdots & \cdots\\
+\vdots & \vdots & \vdots & \vdots \\
+\phi(||\mathbf{x}_N - \mathbf{m}_1||/\sigma) & \cdots & \cdots & \phi(||\mathbf{x}_N - \mathbf{m}_M||/\sigma)
+\end{pmatrix}
+\end{equation*}
+
+Therefore,
+\begin{equation*}
+\mathbf{Y\lambda} = \mathbf{f}
+\end{equation*}
+
+And so we can define an optimisation problem as such
+\begin{equation*}
+\hat{\mathbf{\lambda}} = \min_\mathbf{\lambda}\left( ||\mathbf{Y\lambda}-\mathbf{f}||^2 \right)
+\end{equation*}
+
+This is the same shape as for linear regression so I will not repeat the solution here. This similarity leads to the intuition that RBF is mapping from a space in which the problem is non-linear to a higher dimensional space in which the problem is (hopefully) linear, and then performing linear regression in this new space. 
 
 ** Classification
 *** Bayesian Decision Theory
