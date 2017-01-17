@@ -303,6 +303,95 @@ And so we can define an optimisation problem as such
 
 This is the same shape as for linear regression so I will not repeat the solution here. This similarity leads to the intuition that RBF is mapping from a space in which the problem is non-linear to a higher dimensional space in which the problem is (hopefully) linear, and then performing linear regression in this new space. 
 
+** Neural Networks
+Neural networks are another method of function approximation. The training data consists of inputs $\mathbf{x_i} \in \mathbb{R}^d_1$ and matching targets $\mathbf{t_i} \in \mathbb{R}^d_2$. I will consider neural networks with a single hidden layer. In an arbitrarily large network with only one hidden layer, one can approximate any smooth function (See "Approximation by Superpositions of a Sigmoidal Function" - G. Cybenko (1989)). 
+
+In this section I will use superscript notation in brackets to index which layer, variables relate to. Layer 0 is the inputs, 1 is the hidden layer and 2 is the outputs. Each unit in the network performs the following:
+\begin{equation*}
+\mathrm{net}_j^{(l)}(\mathbf{x}) = \sum_{i=1}^dx_iw_{ji}^{(l)}+w_{j0}^{(l)}
+\end{equation*}
+
+The result of this is squashed by some non-linear function
+\begin{equation*}
+y_j^{(l)}(\mathbf{x}) = f(\mathrm{net}_j^{(l)}(\mathbf{x}))
+\end{equation*}
+
+The sigmoid function is commonly used for this because it is what is used in biological neural networks and it relates to posterior probabilities. 
+
+Although the notation is slightly different, here is a picture of the kind of neural network I will be considering:
+
+[[./nnet.png]]
+
+*** Backpropogation
+The goal of backprogation is to learn the weights to use to achieve the lowest error.
+
+We will use the error function
+\begin{equation*}
+J(\mathcal{W}) = \frac{1}{2}\sum_{i=1}^N||\mathbf{t}_i-\mathbf{y}_i^{(L)}||^2
+\end{equation*}
+This is mean squared error for the i'th training sample ($i=1,2,\dots,N$). $\mathcal{W}$ is the collection of all of the weights $\{\mathbf{W}^{(l)}\}_{l=1}^L$. The factor of a half is just for algebraic convenience. As it is constant it does not effect the result.
+
+As always, the objective is to minimise this error function with respect to these weights. Doing so with stochastic gradient decent requires the computation of 
+\begin{equation*}
+\Delta W_{pq}^{(l)} = - \eta \frac{\partial J}{\partial W_{pq}^{(l)}}
+\end{equation*}
+
+**** The output layer
+First lets consider doing this for the output layer (layer $L$):
+\begin{align*}
+\frac{\partial J}{\partial W_{pq}^{(L)}} = \frac{\partial J}{\partial\mathrm{net}_p^{(L)}} \frac{\partial\mathrm{net}_p^{(L)}}{\partial W_{pq}^{(l)}} = -&\delta_p^{(L)}\frac{\partial\mathrm{net}_p^{(L)}}{\partial W_{pq}^{(l)}}\\
+\text{Where }\quad &\delta_p^{(L)} := - \frac{\partial J}{\partial \mathrm{net}_p^{(L)}}\\
+\therefore\: &\delta_p^{(L)} = -\underbrace{\frac{\partial J}{\partial y_p^{(L)}}}_\textit{Note 1} \overbrace{\frac{\partial y_p^{(L)}}{\partial \mathrm{net}_p^{(L)}}}^\textit{Note 2} = \underbrace{\left((\mathbf{t_{i}})_p - (\mathbf{y_{i}})_p^{(L)}\right)}_\text{Error at the output}\overbrace{f'(\mathrm{net}_p^{(L)})}^\text{Slope of non-linearity}
+\end{align*}
+/Note 1/: The partial differential of the error with respect to the output of the p'th node of the output layer
+
+/Note 2/: The partial differential of the output of the p'th node of the output layer with respect to it's net activation
+
+The other differential is trivial
+\begin{equation*}
+\frac{\partial\mathrm{net}_p^{(L)}}{\partial W_{pq}^{(L)}} = (\mathbf{y_i})_{q}^{(L-1)} \quad =\quad \text{The output of the q'th unit of the previous layer}
+\end{equation*}
+
+So to summarise
+\begin{equation*}
+\Delta W_{pq}^{(L)} = \eta\,\delta_p^{(L)}(\mathbf{y_i})_{q}^{(L-1)}
+\end{equation*}
+
+**** The hidden layer
+The hidden layer is layer $l=L-1$
+\begin{equation*}
+\frac{\partial J}{\partial W_{pq}^{(l)}} = \frac{\partial J}{\partial (\mathbf{y_i})_p^{(l)}}\frac{\partial (\mathbf{y_i})_p^{(l)}}{\partial \mathrm{net}_p^{(l)}} \frac{\partial \mathrm{net}_p^{(l)}}{\partial W_{pq}^{(l)}}
+\end{equation*}
+
+Two of these are simple enough:
+\begin{align*}
+\frac{\partial (\mathbf{y_i})_p^{(l)}}{\partial \mathrm{net}_p^{(l)}} &= f'(\mathrm{net}_p^{(l)}) \\
+\frac{\partial \mathrm{net}_p^{(l)}}{\partial W_{pq}^{(l)}} &= (\mathbf{y_i})_{q}^{(l-1)}
+\end{align*}
+Note that layer 0 is the input layer and so for $l=1$, $(\mathbf{y_i})_{q}^{(l-1)} = (\mathbf{x_i})_{q}$.
+
+The last of the differentials is more work:
+\begin{align*}
+\frac{\partial J}{\partial (\mathbf{y_i})_p^{(l)}} &= \frac{\partial}{\partial (\mathbf{y_i})_p^{(l)}}\left( \frac{1}{2}\sum_{k=1}^c\left((\mathbf{t_i})_k - (\mathbf{y_i})_k^{(L)}\right)^2 \right) \\
+&= -\sum_{k=1}^c\left((\mathbf{t_i})_k - (\mathbf{y_i})_k^{(L)}\right)\frac{\partial (\mathbf{y_i})_k^{(L)}}{\partial (\mathbf{y_i})_p^{(L-1)}} \\
+&= -\sum_{k=1}^c\left((\mathbf{t_i})_k - (\mathbf{y_i})_k^{(L)}\right) \frac{\partial (\mathbf{y_i})_k^{(L)}}{\partial \mathrm{net}_k^{(L)}} \frac{\partial \mathrm{net}_k^{(L)}}{\partial (\mathbf{y_i})_p^{(L-1)}} \\
+&= -\sum_{k=1}^c\left((\mathbf{t_i})_k - (\mathbf{y_i})_k^{(L)}\right) f'\left(\mathrm{net}_k^{(L)}\right)W_{kp}^{(L)} \\
+&= -\sum_{k=1}^c \delta_k^{(L)} W_{kp}^{(L)} \\
+\end{align*}
+
+So to summarise
+\begin{equation*}
+\Delta W_{pq}^{(L-1)} = \eta\,f'(\mathrm{net}_p^{(L-1)})(\mathbf{y_i})_{q}^{(L-2)} \sum_{k=1}^c \delta_k^{(L)} W_{kp}^{(L)}
+\end{equation*}
+
+This means that the change in each hidden layer unit's weights is proportional to the error in each output it is connected to, scaled by this unit's weight on that output. This is why errors are said to propagate backwards through the network.
+
+*** Speeding Up and Improving Performance
+1. Newton's Method can be used instead of gradient decent to converge quicker. However, this requires $\mathcal{O}(N^2)$ storage and $\mathcal{O}(N^3)$ computation.
+2. "Momentum" can be used to speed up learning in regions in which the gradient is small by adding a term relating to the gradient for the previous step to accelerate the decent down the gradient (by assuming that the gradient is in about the same direction as it was previously)
+3. As an alternative to newton's method, two subsequent gradient evaluations can be used to approximate local curvature, which may then be used in a second order method to achieve faster learning.
+4. Stop training early when cross-validation error begins to increase (indicating over fitting - high variance)
+
 ** Classification
 *** Bayesian Decision Theory
 I will only consider gaussian distributed data. This is common because of the [[https://en.wikipedia.org/wiki/Central_limit_theorem][Central Limit Theorem]]. The aim is to learn the mean and co-variance for each class. Data can then be assigned to the most probable class. 

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Machine Learning Revision</title>
-<!-- 2017-01-16 Mon 12:10 -->
+<!-- 2017-01-17 Tue 20:09 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Tom Eccles" />
@@ -215,16 +215,22 @@ for the JavaScript code in this tag.
 <li><a href="#sec-3-1-2">3.1.2. Radial Basis Functions</a></li>
 </ul>
 </li>
-<li><a href="#sec-3-2">3.2. Classification</a>
+<li><a href="#sec-3-2">3.2. Neural Networks</a>
 <ul>
-<li><a href="#sec-3-2-1">3.2.1. Bayesian Decision Theory</a></li>
-<li><a href="#sec-3-2-2">3.2.2. Fisher Linear Discriminant Analysis</a></li>
-<li><a href="#sec-3-2-3">3.2.3. Perceptron</a></li>
+<li><a href="#sec-3-2-1">3.2.1. Backpropogation</a></li>
+<li><a href="#sec-3-2-2">3.2.2. Speeding Up and Improving Performance</a></li>
 </ul>
 </li>
-<li><a href="#sec-3-3">3.3. Estimation</a>
+<li><a href="#sec-3-3">3.3. Classification</a>
 <ul>
-<li><a href="#sec-3-3-1">3.3.1. Example - Univariate Gaussian Data</a></li>
+<li><a href="#sec-3-3-1">3.3.1. Bayesian Decision Theory</a></li>
+<li><a href="#sec-3-3-2">3.3.2. Fisher Linear Discriminant Analysis</a></li>
+<li><a href="#sec-3-3-3">3.3.3. Perceptron</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-4">3.4. Estimation</a>
+<ul>
+<li><a href="#sec-3-4-1">3.4.1. Example - Univariate Gaussian Data</a></li>
 </ul>
 </li>
 </ul>
@@ -728,11 +734,166 @@ This is the same shape as for linear regression so I will not repeat the solutio
 </div>
 
 <div id="outline-container-sec-3-2" class="outline-3">
-<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Classification</h3>
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Neural Networks</h3>
 <div class="outline-text-3" id="text-3-2">
-</div><div id="outline-container-sec-3-2-1" class="outline-4">
-<h4 id="sec-3-2-1"><span class="section-number-4">3.2.1</span> Bayesian Decision Theory</h4>
+<p>
+Neural networks are another method of function approximation. The training data consists of inputs \(\mathbf{x_i} \in \mathbb{R}^d_1\) and matching targets \(\mathbf{t_i} \in \mathbb{R}^d_2\). I will consider neural networks with a single hidden layer. In an arbitrarily large network with only one hidden layer, one can approximate any smooth function (See "Approximation by Superpositions of a Sigmoidal Function" - G. Cybenko (1989)). 
+</p>
+
+<p>
+In this section I will use superscript notation in brackets to index which layer, variables relate to. Layer 0 is the inputs, 1 is the hidden layer and 2 is the outputs. Each unit in the network performs the following:
+</p>
+\begin{equation*}
+\mathrm{net}_j^{(l)}(\mathbf{x}) = \sum_{i=1}^dx_iw_{ji}^{(l)}+w_{j0}^{(l)}
+\end{equation*}
+
+<p>
+The result of this is squashed by some non-linear function
+</p>
+\begin{equation*}
+y_j^{(l)}(\mathbf{x}) = f(\mathrm{net}_j^{(l)}(\mathbf{x}))
+\end{equation*}
+
+<p>
+The sigmoid function is commonly used for this because it is what is used in biological neural networks and it relates to posterior probabilities. 
+</p>
+
+<p>
+Although the notation is slightly different, here is a picture of the kind of neural network I will be considering:
+</p>
+
+
+<div class="figure">
+<p><img src="./nnet.png" alt="nnet.png" />
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1"><span class="section-number-4">3.2.1</span> Backpropogation</h4>
 <div class="outline-text-4" id="text-3-2-1">
+<p>
+The goal of backprogation is to learn the weights to use to achieve the lowest error.
+</p>
+
+<p>
+We will use the error function
+</p>
+\begin{equation*}
+J(\mathcal{W}) = \frac{1}{2}\sum_{i=1}^N||\mathbf{t}_i-\mathbf{y}_i^{(L)}||^2
+\end{equation*}
+<p>
+This is mean squared error for the i'th training sample (\(i=1,2,\dots,N\)). \(\mathcal{W}\) is the collection of all of the weights \(\{\mathbf{W}^{(l)}\}_{l=1}^L\). The factor of a half is just for algebraic convenience. As it is constant it does not effect the result.
+</p>
+
+<p>
+As always, the objective is to minimise this error function with respect to these weights. Doing so with stochastic gradient decent requires the computation of 
+</p>
+\begin{equation*}
+\Delta W_{pq}^{(l)} = - \eta \frac{\partial J}{\partial W_{pq}^{(l)}}
+\end{equation*}
+</div>
+
+<ol class="org-ol"><li><a id="sec-3-2-1-1" name="sec-3-2-1-1"></a>The output layer<br  /><div class="outline-text-5" id="text-3-2-1-1">
+<p>
+First lets consider doing this for the output layer (layer \(L\)):
+</p>
+\begin{align*}
+\frac{\partial J}{\partial W_{pq}^{(L)}} = \frac{\partial J}{\partial\mathrm{net}_p^{(L)}} \frac{\partial\mathrm{net}_p^{(L)}}{\partial W_{pq}^{(l)}} = -&\delta_p^{(L)}\frac{\partial\mathrm{net}_p^{(L)}}{\partial W_{pq}^{(l)}}\\
+\text{Where }\quad &\delta_p^{(L)} := - \frac{\partial J}{\partial \mathrm{net}_p^{(L)}}\\
+\therefore\: &\delta_p^{(L)} = -\underbrace{\frac{\partial J}{\partial y_p^{(L)}}}_\textit{Note 1} \overbrace{\frac{\partial y_p^{(L)}}{\partial \mathrm{net}_p^{(L)}}}^\textit{Note 2} = \underbrace{\left((\mathbf{t_{i}})_p - (\mathbf{y_{i}})_p^{(L)}\right)}_\text{Error at the output}\overbrace{f'(\mathrm{net}_p^{(L)})}^\text{Slope of non-linearity}
+\end{align*}
+<p>
+<i>Note 1</i>: The partial differential of the error with respect to the output of the p'th node of the output layer
+</p>
+
+<p>
+<i>Note 2</i>: The partial differential of the output of the p'th node of the output layer with respect to it's net activation
+</p>
+
+<p>
+The other differential is trivial
+</p>
+\begin{equation*}
+\frac{\partial\mathrm{net}_p^{(L)}}{\partial W_{pq}^{(L)}} = (\mathbf{y_i})_{q}^{(L-1)} \quad =\quad \text{The output of the q'th unit of the previous layer}
+\end{equation*}
+
+<p>
+So to summarise
+</p>
+\begin{equation*}
+\Delta W_{pq}^{(L)} = \eta\,\delta_p^{(L)}(\mathbf{y_i})_{q}^{(L-1)}
+\end{equation*}
+</div>
+</li>
+
+<li><a id="sec-3-2-1-2" name="sec-3-2-1-2"></a>The hidden layer<br  /><div class="outline-text-5" id="text-3-2-1-2">
+<p>
+The hidden layer is layer \(l=L-1\)
+</p>
+\begin{equation*}
+\frac{\partial J}{\partial W_{pq}^{(l)}} = \frac{\partial J}{\partial (\mathbf{y_i})_p^{(l)}}\frac{\partial (\mathbf{y_i})_p^{(l)}}{\partial \mathrm{net}_p^{(l)}} \frac{\partial \mathrm{net}_p^{(l)}}{\partial W_{pq}^{(l)}}
+\end{equation*}
+
+<p>
+Two of these are simple enough:
+</p>
+\begin{align*}
+\frac{\partial (\mathbf{y_i})_p^{(l)}}{\partial \mathrm{net}_p^{(l)}} &= f'(\mathrm{net}_p^{(l)}) \\
+\frac{\partial \mathrm{net}_p^{(l)}}{\partial W_{pq}^{(l)}} &= (\mathbf{y_i})_{q}^{(l-1)}
+\end{align*}
+<p>
+Note that layer 0 is the input layer and so for \(l=1\), \((\mathbf{y_i})_{q}^{(l-1)} = (\mathbf{x_i})_{q}\).
+</p>
+
+<p>
+The last of the differentials is more work:
+</p>
+\begin{align*}
+\frac{\partial J}{\partial (\mathbf{y_i})_p^{(l)}} &= \frac{\partial}{\partial (\mathbf{y_i})_p^{(l)}}\left( \frac{1}{2}\sum_{k=1}^c\left((\mathbf{t_i})_k - (\mathbf{y_i})_k^{(L)}\right)^2 \right) \\
+&= -\sum_{k=1}^c\left((\mathbf{t_i})_k - (\mathbf{y_i})_k^{(L)}\right)\frac{\partial (\mathbf{y_i})_k^{(L)}}{\partial (\mathbf{y_i})_p^{(L-1)}} \\
+&= -\sum_{k=1}^c\left((\mathbf{t_i})_k - (\mathbf{y_i})_k^{(L)}\right) \frac{\partial (\mathbf{y_i})_k^{(L)}}{\partial \mathrm{net}_k^{(L)}} \frac{\partial \mathrm{net}_k^{(L)}}{\partial (\mathbf{y_i})_p^{(L-1)}} \\
+&= -\sum_{k=1}^c\left((\mathbf{t_i})_k - (\mathbf{y_i})_k^{(L)}\right) f'\left(\mathrm{net}_k^{(L)}\right)W_{kp}^{(L)} \\
+&= -\sum_{k=1}^c \delta_k^{(L)} W_{kp}^{(L)} \\
+\end{align*}
+
+<p>
+So to summarise
+</p>
+\begin{equation*}
+\Delta W_{pq}^{(L-1)} = \eta\,f'(\mathrm{net}_p^{(L-1)})(\mathbf{y_i})_{q}^{(L-2)} \sum_{k=1}^c \delta_k^{(L)} W_{kp}^{(L)}
+\end{equation*}
+
+<p>
+This means that the change in each hidden layer unit's weights is proportional to the error in each output it is connected to, scaled by this unit's weight on that output. This is why errors are said to propagate backwards through the network.
+</p>
+</div>
+</li></ol>
+</div>
+
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> Speeding Up and Improving Performance</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<ol class="org-ol">
+<li>Newton's Method can be used instead of gradient decent to converge quicker. However, this requires \(\mathcal{O}(N^2)\) storage and \(\mathcal{O}(N^3)\) computation.
+</li>
+<li>"Momentum" can be used to speed up learning in regions in which the gradient is small by adding a term relating to the gradient for the previous step to accelerate the decent down the gradient (by assuming that the gradient is in about the same direction as it was previously)
+</li>
+<li>As an alternative to newton's method, two subsequent gradient evaluations can be used to approximate local curvature, which may then be used in a second order method to achieve faster learning.
+</li>
+<li>Stop training early when cross-validation error begins to increase (indicating over fitting - high variance)
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> Classification</h3>
+<div class="outline-text-3" id="text-3-3">
+</div><div id="outline-container-sec-3-3-1" class="outline-4">
+<h4 id="sec-3-3-1"><span class="section-number-4">3.3.1</span> Bayesian Decision Theory</h4>
+<div class="outline-text-4" id="text-3-3-1">
 <p>
 I will only consider gaussian distributed data. This is common because of the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">Central Limit Theorem</a>. The aim is to learn the mean and co-variance for each class. Data can then be assigned to the most probable class. 
 </p>
@@ -832,9 +993,9 @@ For a two class problem, this is an obvious case of a sigmoidal function. For mo
 </div>
 </div>
 </div>
-<div id="outline-container-sec-3-2-2" class="outline-4">
-<h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> Fisher Linear Discriminant Analysis</h4>
-<div class="outline-text-4" id="text-3-2-2">
+<div id="outline-container-sec-3-3-2" class="outline-4">
+<h4 id="sec-3-3-2"><span class="section-number-4">3.3.2</span> Fisher Linear Discriminant Analysis</h4>
+<div class="outline-text-4" id="text-3-3-2">
 <p>
 The idea behind fisher linear discriminant analysis is to project a higher dimensional problem which is hard to separate onto a lower dimensional surface which has chosen so as to maximise separability.
 </p>
@@ -898,9 +1059,9 @@ Once projected onto this line, data should be more easily separable using Bayesi
 </p>
 </div>
 </div>
-<div id="outline-container-sec-3-2-3" class="outline-4">
-<h4 id="sec-3-2-3"><span class="section-number-4">3.2.3</span> Perceptron</h4>
-<div class="outline-text-4" id="text-3-2-3">
+<div id="outline-container-sec-3-3-3" class="outline-4">
+<h4 id="sec-3-3-3"><span class="section-number-4">3.3.3</span> Perceptron</h4>
+<div class="outline-text-4" id="text-3-3-3">
 <p>
 Perceptron follows a similar process to linear regression except the output is discrete: \(f \: : \: \mathbb{R}^p \to \{1, -1\}\). Our model is 
 </p>
@@ -943,9 +1104,9 @@ Therefore, using randomly chosen \(\mathbf{y}_n\) we can update like this
 </div>
 </div>
 </div>
-<div id="outline-container-sec-3-3" class="outline-3">
-<h3 id="sec-3-3"><span class="section-number-3">3.3</span> Estimation</h3>
-<div class="outline-text-3" id="text-3-3">
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> Estimation</h3>
+<div class="outline-text-3" id="text-3-4">
 <p>
 I will not discuss Baysean estimation.
 </p>
@@ -979,9 +1140,9 @@ As always, this means differentiating and setting it equal to zero:
 \end{equation*}
 </div>
 
-<div id="outline-container-sec-3-3-1" class="outline-4">
-<h4 id="sec-3-3-1"><span class="section-number-4">3.3.1</span> Example - Univariate Gaussian Data</h4>
-<div class="outline-text-4" id="text-3-3-1">
+<div id="outline-container-sec-3-4-1" class="outline-4">
+<h4 id="sec-3-4-1"><span class="section-number-4">3.4.1</span> Example - Univariate Gaussian Data</h4>
+<div class="outline-text-4" id="text-3-4-1">
 <p>
 So substituting in using \(\theta_1 = m\) and \(\theta_2 = \sigma^2\)
 </p>
@@ -1118,7 +1279,7 @@ K-means can be derived from EM by setting q<sub>nk</sub> to 1 for only the large
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Tom Eccles</p>
-<p class="date">Created: 2017-01-16 Mon 12:10</p>
+<p class="date">Created: 2017-01-17 Tue 20:09</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.5.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
