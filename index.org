@@ -528,6 +528,67 @@ Therefore, using randomly chosen $\mathbf{y}_n$ we can update like this
 \begin{equation*}
 \mathbf{a}^{(k+1)} = \mathbf{a}^{(k)} + \mathbf{y}_n
 \end{equation*}
+*** Support Vector Machines
+Here we will only consider a brief introduction to support vector machines in which data are linearly separable. 
+
+The problem with perceptron classification is that it makes no distinction between decision boundaries which only work for the training data and decision boundaries which generalise well to unseen data. The idea in support vector machines is to maximise the margin between the decision boundary and the edges of the classes to be separated so that the likelihood of unseen data being found on the wrong side of the decision boundary is minimised. Intuitively this is like trying to draw the thickest decision line as possible. 
+
+Notation:
+\begin{align*}
+\text{Decision boundary hyperplane:} &\quad \mathbf{w}^T\mathbf{x}+b=0 \\
+\text{Data:} &\quad \mathcal{D} = \{\mathbf{x_n}, y_n\}^N_{n=1}, \quad \mathbf{x_n}\in\mathbb{R}^d,\quad y_n \in \{-1, +1\} \\
+\text{Learning problem:} &\quad y_n(\mathbf{w}^T\mathbf{x}+b)\geq 1 \quad \forall n=1,2,\dots,N
+\end{align*}
+
+Assume that the decision boundary defined by $(\mathbf{w}, b)$ separates the data. Therefore the following can be derived:
+\begin{align*}
+\left(\text{Width of margin}\right) &= \left(\text{Distance from the decision boundary to the closest point in class -1}\right) + \left(\text{Distance from the decision boundary to the closest point in class +1}\right) \\
+&= \min_{\mathbf{x_n}:\,y_n=-1}\left(\frac{|\mathbf{w}^T\mathbf{x_n}+b|}{||\mathbf{w}||}\right) + \min_{\mathbf{x_n}:\,y_n=+1}\left(\frac{|\mathbf{w}^T\mathbf{x_n}+b|}{||\mathbf{w}||}\right) \\
+&= \frac{1}{||\mathbf{w}||}\left( \min_{\mathbf{x_n}:\,y_n=-1}\left(|\mathbf{w}^T\mathbf{x_n}+b|\right) + \min_{\mathbf{x_n}:\,y_n=-1}\left(|\mathbf{w}^T\mathbf{x_n}+b|\right) \right) \\
+&= \frac{1}{||\mathbf{w}||}\left( k_1 + k_2 \right)
+\end{align*}
+
+$k_1$ and $k_2$ are influenced more by the particular training data than anything else and their variation is not important because with a constant dataset, changing $\mathbf{w}$ or $b$ will not change the result of $k_1 + k_2$ (because going closer to one class means going further from another). As we have assumed that the learning problem is solved, $k_1 + k_2$ cannot be smaller than $2$ for any data (each $k_n$ must be at least 1 for the learning condition to hold). 
+
+So to solve the initial problem, we want to find the $\mathbf{w}$ which maximises this margin width, under the constraints that all data points are correctly classified according to the learning problem:
+\begin{equation*}
+\max_\mathbf{w}\left(\frac{1}{||\mathbf{w}||}\right) \quad \text{subject to} \quad y_n(\mathbf{w}^T\mathbf{x_n}+b)\geq 1 \quad \forall n
+\end{equation*}
+
+This function is not a nice shape for optimisation so we will instead solve the equivalent problem
+\begin{equation*}
+\min_\mathbf{w}\left(||\mathbf{w}||^2\right) \quad \text{subject to} \quad y_n(\mathbf{w}^T\mathbf{x_n}+b)\geq 1 \quad \forall n
+\end{equation*}
+
+As this is quadratic, it will behave well. Writing this as a lagrangian is the following:
+\begin{equation*}
+\mathcal{L}(\mathbf{w}, b, \mathbf{\lambda}) := ||\mathbf{w}||^2 - \sum_{n=1}^N\lambda_n(y_n(\mathbf{w}^T\mathbf{x_n}+b)-1), \, \lambda_n \geq 0
+\end{equation*}
+
+As always with these problems we set $\mathbf{\nabla}\mathcal{L} = \mathbf{0}$.
+\begin{align*}
+\frac{\partial\mathcal{L}}{\partial b} =0 &\implies \sum_{n=1}^N\lambda_ny_n=0 \\
+\frac{\partial\mathcal{L}}{\partial \mathbf{w}} = 0 &\implies \mathbf{w} = \sum_{n=1}^N\lambda_ny_n\mathbf{x_n}
+\end{align*}
+
+This leads to the following quadratic programming problem, which can be solved numerically.
+\begin{equation*}
+\min_\mathbf{\lambda}\left(\sum_{i=1}^N\sum_{j=1}^N\lambda_i\lambda_jy_iy_j\mathbf{x_i}^T\mathbf{x_j}-\sum_{k=1}^N\lambda_k\right) \quad \text{subject to} \quad \lambda_n \geq 0 \quad \text{and} \quad \sum_{n=1}^N\lambda_ny_n=0
+\end{equation*}
+
+Finally, the bias term can be found using the support vectors $\mathbf{x_n}$
+\begin{align*}
+y_n\left(\mathbf{w}^T\mathbf{x_n} + b\right) = 1 \\
+y_n^2\left(\mathbf{w}^T\mathbf{x_n} + b\right) = y_n \\
+\left(\mathbf{w}^T\mathbf{x_n} + b\right) = y_n \\
+\therefore b = y_n -\mathbf{w}^T\mathbf{x_n}
+\end{align*}
+
+In practice, an average will be taken over all support vectors
+\begin{equation*}
+b = \frac{1}{N}\sum_{n=1}^N\left(y_n -\mathbf{w}^T\mathbf{x_n}\right)
+\end{equation*}
+
 ** Estimation
 I will not discuss Baysean estimation.
 
