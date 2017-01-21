@@ -6,7 +6,7 @@
 * About This Document
 This document contains my revision notes for COMP3206 Machine Learning as taught by Professor Mahesan Niranjan at the University of Southampton. This work was produced based on his lectures but any inaccuracies and misunderstandings contained herein are almost certainly my own mistake. This does not represent the whole module, only what I expect to find on the exam.
 
-This document may be distributed under the terms of the [[https://www.gnu.org/licenses/fdl.html][GNU Free Documentation Licence]]. A copy of the licence can be found [[https://www.gnu.org/licenses/fdl-1.3-standalone.html][here]].
+This document may be distributed under the terms of the [[https://www.gnu.org/licenses/fdl.html][GNU Free Documentation Licence]]. A copy of the licence can be found [[https://www.gnu.org/licenses/fdl-1.3-standalone.html][here]]. Please feel free to ask questions and contribute improvements at the [[https://github.com/tblah/ml-revision][git repo]].
 * Maths Review
 This section *very* briefly reviews some of the maths needed for the rest of the document.
 
@@ -43,7 +43,7 @@ This can be used to project $\mathbf{x}$ along the direction $\mathbf{u}$:
 \mathrm{projection} = \frac{\mathbf{x}^T \mathbf{u}}{|\mathbf{u}|}\mathbf{u}
 \end{equation*}
 
-As an example of matrix algebra: a diagonal matrix is a scalar multiple of the identity matrix. A diagonalizable matrix can be written in erms of a diagonal matrix $\mathbf{D}$ and some transformation matrix $\mathbf{S}$ as follows:
+As an example of matrix algebra: a diagonal matrix is a scalar multiple of the identity matrix. A diagonalizable matrix can be written in terms of a diagonal matrix $\mathbf{D}$ and some transformation matrix $\mathbf{S}$ as follows:
 \begin{equation*}
 \mathbf{A} = \mathbf{SDS}^{-1} = \mathbf{S}a\mathbf{IS}^{-1}
 \end{equation*}
@@ -101,7 +101,7 @@ Another use for $\mathbf{P}$ is to construct $(2\mathbf{P} - \mathbf{I})$, which
 (2\mathbf{P} - \mathbf{I})\mathbf{x} &= 2\mathbf{Px} - \mathbf{x} \\
                                      &= 2\mathbf{u}(\mathbf{u}\cdot\mathbf{x}) - \mathbf{x}
 \end{align*}
-To see this, it helps to plot it.
+To see this, it helps to sketch it.
 
 ** Calculus
 *** Basics
@@ -114,7 +114,7 @@ For a function $f\: : \: \mathbb{R}^N \to \mathbb{R}$
 \frac{\partial f}{\partial x_N} \\
 \end{pmatrix}
 \end{equation*}
-$\mathbf{\nabla}$ should be thought of as the vector gradient of $f$. 
+$\mathbf{\nabla f}$ should be thought of as the vector gradient of $f$. 
 
 For example, consider $f(\mathbf{x}) := \mathbf{x}^T\mathbf{Ax}$, $\mathbf{x} \in \mathbb{R}^2$, where $\mathbf{A}$ is symmetric ($A_{21} = A_{12}$)
 \begin{align*}
@@ -128,6 +128,8 @@ For example, consider $f(\mathbf{x}) := \mathbf{x}^T\mathbf{Ax}$, $\mathbf{x} \i
 \end{pmatrix} \\
 &= 2\mathbf{Ax}
 \end{align*}
+
+Usually I will write this as $\partial f/\partial \mathbf{x}$ so as to distinguish this from the case where $f$ is a function of several vectors (for which I will use $\mathbf{\nabla}$).
 
 Similarly, $\mathbf{H}$ (the hessian matrix). This represents the local curvature of a function $f\: : \: \mathbb{R}^N \to \mathbb{R}$ using second order partial derivatives. The hessian matrix can be defined as
 \begin{equation*}
@@ -146,22 +148,22 @@ Gradient decent is like taking the path down the gradient to the bottom of the m
 
 Newton's method converges faster than gradient decent but is also far more computationally intensive
 \begin{equation*}
-\mathbf{x}^{(n+1)} = \mathbf{x}^{(n)} - \mathbf{H}^{-1}\mathbf{f(\mathbf{x})}
+\mathbf{x}^{(n+1)} = \mathbf{x}^{(n)} - \eta\mathbf{H}^{-1}\mathbf{f(\mathbf{x})}
 \end{equation*}
 
 **** Constrained - Lagrange Multipliers
-To minimise $f \: : \: \mathbb{R}^n \to \mathbb{R}$ subject to conditions $g_i \: : \mathbb{R}^{d_i} \to \mathbb{R} = 0, \: d_i\leq n, \: i = 1, 2, \dots, m$, define $F \: : \: \mathbb{R}^{n+m} \to \mathbb{R} \: := f(\cdot) - \sum_{i=1}^{N}\lambda_i g_i(\cdot)$. The minimum (or maximum) will be at $\mathbf{\nabla F} = \mathbf{0}$. 
+To minimise $f \: : \: \mathbb{R}^n \to \mathbb{R}$ subject to conditions $g_i \: : \mathbb{R}^{d_i} \to \mathbb{R} = 0, \: d_i\leq n, \: i = 1, 2, \dots, m$, define $\mathcal{L} \: : \: \mathbb{R}^{n+m} \to \mathbb{R} \: := f(\cdot) - \sum_{i=1}^{N}\lambda_i g_i(\cdot)$. The minimum (or maximum) will be at $\mathbf{\nabla \mathcal{L}} = \mathbf{0}$. 
 
 Example:
 Minimise $f(x,y)=xy$ subject to $x^2+y^2=8$
 \begin{align*}
 &g(x,y) = x^2+y^2-8 \\
-&F(x,y,\lambda) = xy - \lambda(x^2+y^2-8) \\
-&\mathbf{\nabla F}(x,y,\lambda) = \mathbf{0} \\
-&\frac{\partial F}{\partial x} = y - 2\lambda x = 0 \\
-&\frac{\partial F}{\partial y} = x - 2\lambda y = 0 \\
+&\mathcal{L}(x,y,\lambda) = xy - \lambda(x^2+y^2-8) \\
+&\mathbf{\nabla \mathcal{L}}(x,y,\lambda) = \mathbf{0} \\
+&\frac{\partial \mathcal{L}}{\partial x} = y - 2\lambda x = 0 \\
+&\frac{\partial \mathcal{L}}{\partial y} = x - 2\lambda y = 0 \\
 &\therefore x = y \\
-&\frac{\partial F}{\partial \lambda} = x^2 + y^2 -8 = 0 \\
+&\frac{\partial \mathcal{L}}{\partial \lambda} = x^2 + y^2 -8 = 0 \\
 &\therefore 2x^2 - 8 = 0 \\
 &\therefore x = y = \pm 2
 \end{align*}
@@ -208,7 +210,7 @@ The function $f$ forms our model, we have some training data $\{\mathbf{y}_n, f_
 
 To learn $\mathbf{a}$, construct a squared distance error function:
 \begin{equation*}
-E = \sum_{n=1}^N (\mathbf{y}_n^T\mathbf{a} - f_n)^2 = |\mathbf{Ya}-\mathbf{f}|^2
+E = \sum_{n=1}^N (\mathbf{y}_n^T\mathbf{a} - f_n)^2 = ||\mathbf{Ya}-\mathbf{f}||^2
 \end{equation*}
 
 The error function should be minimised with respect to $\mathbf{a}$.
@@ -218,24 +220,24 @@ As $E$ is quadratic in $\mathbf{a}$ and positive valued, we can be sure that the
 
 To find this turning point, equate the differential of $E$ with respect to $\mathbf{a}$ to zero.
 \begin{align*}
-\mathbf{\nabla_a} E &= 0 \\
+\frac{\partial E}{\partial \mathbf{a}} &= 0 \\
                     &= 2\mathbf{Y}^T(\mathbf{Ya} - \mathbf{f}) \\
 \therefore \mathbf{Y}^T\mathbf{Ya} &= \mathbf{Y}^T\mathbf{f} \\
 \therefore              \mathbf{a} &= (\mathbf{Y}^T\mathbf{Y})^{-1}\mathbf{Y}^T\mathbf{f} \\
 \end{align*}
 
-The problem with this solution is that matrix inversion is an $O(n^3)$ problem and the dataset used to construct $\mathbf{Y}$ will typically be very large.
+The problem with this solution is that matrix inversion is an $\mathcal{O}(n^3)$ problem and the dataset used to construct $\mathbf{Y}$ will typically be very large.
 
 **** Gradient Decent
 A less computationally expensive method is to use gradient decent: 
 
 #+BEGIN_SRC
 Initialise a randomly
-Update a[k+1] = a[k] - eta*dE(a)
+Update a[k+1] = a[k] - eta*dE(a[k])
 Until Convergence
 #+END_SRC
 
-Where $\mathrm{dE}$ is $\mathbf{\nabla_a}E$ and eta is a small scalar (increasing $\eta$ leads to faster convergence up to a point, after which the function may not converge at all, decreasing $\eta$ is slower but is more likely to find the minimum).
+Where $\mathrm{dE}$ is $\frac{\partial E}{\partial \mathbf{a}}$ and eta is a small scalar (increasing $\eta$ leads to faster convergence up to a point, after which the function may not converge at all, decreasing $\eta$ is slower but is more likely to find the minimum).
 
 **** Newton's Method
 The solution can also be found using Newton's method. Newton's method will converge a lot faster than gradient decent but computing and inverting $\mathbf{H}$ could be computationally expensive.
@@ -249,7 +251,7 @@ Until Convergence
 Where $\mathrm{invHdE}$ is $\mathbf{H}^{-1}\mathbf{\nabla_a}E$.
 
 **** Regularisation
-The problem of finding $\mathbf{a}$ my not have a unique solution: it may not be a well-posed problem. Therefore, it is helpful to apply regularisation to constrain the solution. One way of doing this is by using a quadratic regulariser.
+The problem of finding $\mathbf{a}$ my not have a unique solution: it may not be a well-posed problem. Therefore, it is helpful to apply regularisation to constrain the solution. One way of doing this is by using a quadratic regulariser. Regularisation helps to ensure that learned results generalise well onto unseen data.
 
 The quadratic regulariser works by adding an additional term to the error function to constrain the magnitude of $\mathbf{a}$:
 \begin{equation*}
@@ -265,10 +267,10 @@ This can then be fed into each solution method we have seen so far. For example 
 \therefore \mathbf{a} &= (\mathbf{Y}^T\mathbf{Y}+\gamma\mathbf{I})^{-1}\mathbf{Y}^T\mathbf{f} \\
 \end{align*}
 
-This regularisation may lead to $\mathbf{a}$ being a sparse matrix. This indicates which variables are actually important.
+This regularisation may lead to $\mathbf{a}$ being a sparse matrix. This indicates which variables are actually important. Regularisation can and probably should be applied to most learning algorithms.
 
 *** Radial Basis Functions
-Radial basis functions allow for the approximation of some non-linear functions. This is done by approximating some function $g(\cdot) \: : \: \mathbb{R}^d \to \mathbb{R}$ using a weighted sum of basis functions $\phi(\cdot) \: : \: \mathbb{R} \to \mathbb{R}$. This is similar to the Fourier transform where signals are expressed as the weighted sum of sine wave basis functions.
+Radial basis functions allow for the approximation of some non-linear functions. This is done by approximating some function $g(\cdot) \: : \: \mathbb{R}^d \to \mathbb{R}$ using a weighted sum of basis functions $\phi(\cdot) \: : \: \mathbb{R} \to \mathbb{R}$. This is similar to the Fourier transform where signals are expressed as the weighted sum of sinusoidal basis functions.
 \begin{equation*}
 g(\mathbf{x}) = \sum_{j=1}^M\lambda_j\phi(||\mathbf{x} - \mathbf{m}_j||/\sigma)
 \end{equation*}
@@ -291,29 +293,31 @@ For data $\{\mathbf{x}_n\}_{n=1}^N$ with labels $\{f_n\}_{n=1}^N$ we can define 
 \end{pmatrix}
 \end{equation*}
 
-Therefore,
+Therefore ideally,
 \begin{equation*}
-\mathbf{Y\lambda} = \mathbf{f}
+g(\cdot) = \mathbf{Y\lambda} \approx f(\cdot)
 \end{equation*}
 
-And so we can define an optimisation problem as such
+And so we can define an optimisation problem as such, in order to learn the best $\lambda$.
 \begin{equation*}
-\hat{\mathbf{\lambda}} = \min_\mathbf{\lambda}\left( ||\mathbf{Y\lambda}-\mathbf{f}||^2 \right)
+\min_\mathbf{\lambda}\left( ||\mathbf{Y\lambda}-\mathbf{f}||^2 \right)
 \end{equation*}
 
 This is the same shape as for linear regression so I will not repeat the solution here. This similarity leads to the intuition that RBF is mapping from a space in which the problem is non-linear to a higher dimensional space in which the problem is (hopefully) linear, and then performing linear regression in this new space. 
 
 ** Neural Networks
-Neural networks are another method of function approximation. The training data consists of inputs $\mathbf{x_i} \in \mathbb{R}^d_1$ and matching targets $\mathbf{t_i} \in \mathbb{R}^d_2$. I will consider neural networks with a single hidden layer. In an arbitrarily large network with only one hidden layer, one can approximate any smooth function (See "Approximation by Superpositions of a Sigmoidal Function" - G. Cybenko (1989)). 
+Neural networks are another method of function approximation. The training data consists of inputs $\mathbf{x_i} \in \mathbb{R}^d_1$ and matching targets $\mathbf{t_i} \in \mathbb{R}^d_2$. I will consider neural networks with a single hidden layer. In an arbitrarily large network with only one hidden layer, one can approximate any smooth function (see "Approximation by Superpositions of a Sigmoidal Function" - G. Cybenko (1989)). 
 
-In this section I will use superscript notation in brackets to index which layer, variables relate to. Layer 0 is the inputs, 1 is the hidden layer and 2 is the outputs. Each unit in the network performs the following:
+In this section I will use superscript notation in brackets to index which layer, variables relate to. Layer 0 is the inputs, 1 is the hidden layer and 2 is the outputs. I write layer 2 (the last layer) as $L$ incase I some day want to generalise this derivation to more hidden units. 
+
+Each unit in the network performs the following:
 \begin{equation*}
-\mathrm{net}_j^{(l)}(\mathbf{x}) = \sum_{i=1}^dx_iw_{ji}^{(l)}+w_{j0}^{(l)}
+\text{The net activation of the j'th unit of layer l} = \mathrm{net}_j^{(l)}(\mathbf{x}) = \sum_{i=1}^dx_iw_{ji}^{(l)}+w_{j0}^{(l)}
 \end{equation*}
 
-The result of this is squashed by some non-linear function
+The result of this is squashed by some non-linear function f(\cdot)
 \begin{equation*}
-y_j^{(l)}(\mathbf{x}) = f(\mathrm{net}_j^{(l)}(\mathbf{x}))
+\text{The output of the j'th unit of layer l} = y_j^{(l)}(\mathbf{x}) = f(\mathrm{net}_j^{(l)}(\mathbf{x}))
 \end{equation*}
 
 The sigmoid function is commonly used for this because it is what is used in biological neural networks and it relates to posterior probabilities. 
@@ -325,7 +329,7 @@ Although the notation is slightly different, here is a picture of the kind of ne
 *** Backpropogation
 The goal of backprogation is to learn the weights to use to achieve the lowest error.
 
-We will use the error function
+We will use this error function:
 \begin{equation*}
 J(\mathcal{W}) = \frac{1}{2}\sum_{i=1}^N||\mathbf{t}_i-\mathbf{y}_i^{(L)}||^2
 \end{equation*}
@@ -370,7 +374,7 @@ Two of these are simple enough:
 \end{align*}
 Note that layer 0 is the input layer and so for $l=1$, $(\mathbf{y_i})_{q}^{(l-1)} = (\mathbf{x_i})_{q}$.
 
-The last of the differentials is more work:
+The remaining differential is more work:
 \begin{align*}
 \frac{\partial J}{\partial (\mathbf{y_i})_p^{(l)}} &= \frac{\partial}{\partial (\mathbf{y_i})_p^{(l)}}\left( \frac{1}{2}\sum_{k=1}^c\left((\mathbf{t_i})_k - (\mathbf{y_i})_k^{(L)}\right)^2 \right) \\
 &= -\sum_{k=1}^c\left((\mathbf{t_i})_k - (\mathbf{y_i})_k^{(L)}\right)\frac{\partial (\mathbf{y_i})_k^{(L)}}{\partial (\mathbf{y_i})_p^{(L-1)}} \\
@@ -407,7 +411,7 @@ Formally, the decision rule is to find $j$ such that
 
 Using Bayes Theorem
 \begin{equation*}
-P[\omega_j|\mathbf{x}] = \frac{p(\mathbf{x}|\omega_j)P[\omega_j]}{\sum_{i=1}^{k} P[\mathbf{x}|\omega_i] P[\omega_i]}
+P[\omega_j|\mathbf{x}] = \frac{p(\mathbf{x}|\omega_j)P[\omega_j]}{\sum_{i=1}^{k} p(\mathbf{x}|\omega_i) P[\omega_i]}
 \end{equation*}
 The denominator is constant with respect to $j$ and so is unimportant for the maximum. Therefore the decision rule can be simplified to
 \begin{equation*}
@@ -461,6 +465,7 @@ For a two class problem, this is an obvious case of a sigmoidal function. For mo
 [[./posteriorProbability3D.png]]
 *** Fisher Linear Discriminant Analysis
 The idea behind fisher linear discriminant analysis is to project a higher dimensional problem which is hard to separate onto a lower dimensional surface which has chosen so as to maximise separability.
+
 #+ATTR_HTML: :width 50%
 [[./projection.jpg]]
 
@@ -514,14 +519,14 @@ Note that the output when the model gives zero is arbitrary.
 
 As with linear regression we will use $\mathbf{w}^T\mathbf{x} + w_0 \equiv \mathbf{y}^T\mathbf{a}$.
 
-The intuitive choice for an error function is to count the number of missclassifications. However, this would create an function which steps discretely (looking like stairs). This is piecewise constant and so cannot be differentiated and so is hard too minimise. Instead we will use the the sum of function outputs across the set of unclassified items $\mathbb{U}$.
+The intuitive choice for an error function is to count the number of missclassifications. However, this would create an function which steps discretely (looking like stairs). This is piecewise constant and so cannot be differentiated and so is hard to minimise. Instead we will use the the sum of function outputs across the set of unclassified items $\mathcal{U}$.
 \begin{equation*}
-E = -\sum_{\mathbb{y}_n \in \mathbb{U}}\mathbf{y}_n^T\mathbf{a}
+E = -\sum_{\mathbb{y}_n \in \mathcal{U}}\mathbf{y}_n^T\mathbf{a}
 \end{equation*}
 
 This may then be minimised using stochastic gradient decent. First the derivative: 
 \begin{equation*}
-\mathbf{\nabla_a}E = -\sum_{\mathbb{y}_n \in \mathbb{U}}\mathbf{y}_n
+\frac{\partial E}{\partial \mathbf{a}} = -\sum_{\mathbb{y}_n \in \mathcal{U}}\mathbf{y}_n
 \end{equation*}
 
 Therefore, using randomly chosen $\mathbf{y}_n$ we can update like this
@@ -536,15 +541,15 @@ The problem with perceptron classification is that it makes no distinction betwe
 Notation:
 \begin{align*}
 \text{Decision boundary hyperplane:} &\quad \mathbf{w}^T\mathbf{x}+b=0 \\
-\text{Data:} &\quad \mathcal{D} = \{\mathbf{x_n}, y_n\}^N_{n=1}, \quad \mathbf{x_n}\in\mathbb{R}^d,\quad y_n \in \{-1, +1\} \\
+\text{Data:} &\quad \mathcal{D} = \{\mathbf{x}_n, y_n\}^N_{n=1}, \quad \mathbf{x}_n\in\mathbb{R}^d,\quad y_n \in \{-1, +1\} \\
 \text{Learning problem:} &\quad y_n(\mathbf{w}^T\mathbf{x}+b)\geq 1 \quad \forall n=1,2,\dots,N
 \end{align*}
 
 Assume that the decision boundary defined by $(\mathbf{w}, b)$ separates the data. Therefore the following can be derived:
 \begin{align*}
 \left(\text{Width of margin}\right) &= \left(\text{Distance from the decision boundary to the closest point in class -1}\right) + \left(\text{Distance from the decision boundary to the closest point in class +1}\right) \\
-&= \min_{\mathbf{x_n}:\,y_n=-1}\left(\frac{|\mathbf{w}^T\mathbf{x_n}+b|}{||\mathbf{w}||}\right) + \min_{\mathbf{x_n}:\,y_n=+1}\left(\frac{|\mathbf{w}^T\mathbf{x_n}+b|}{||\mathbf{w}||}\right) \\
-&= \frac{1}{||\mathbf{w}||}\left( \min_{\mathbf{x_n}:\,y_n=-1}\left(|\mathbf{w}^T\mathbf{x_n}+b|\right) + \min_{\mathbf{x_n}:\,y_n=-1}\left(|\mathbf{w}^T\mathbf{x_n}+b|\right) \right) \\
+&= \min_{\mathbf{x}_n:\,y_n=-1}\left(\frac{|\mathbf{w}^T\mathbf{x}_n+b|}{||\mathbf{w}||}\right) + \min_{\mathbf{x}_n:\,y_n=+1}\left(\frac{|\mathbf{w}^T\mathbf{x}_n+b|}{||\mathbf{w}||}\right) \\
+&= \frac{1}{||\mathbf{w}||}\left( \min_{\mathbf{x}_n:\,y_n=-1}\left(|\mathbf{w}^T\mathbf{x}_n+b|\right) + \min_{\mathbf{x}_n:\,y_n=-1}\left(|\mathbf{w}^T\mathbf{x}_n+b|\right) \right) \\
 &= \frac{1}{||\mathbf{w}||}\left( k_1 + k_2 \right)
 \end{align*}
 
@@ -552,41 +557,41 @@ $k_1$ and $k_2$ are influenced more by the particular training data than anythin
 
 So to solve the initial problem, we want to find the $\mathbf{w}$ which maximises this margin width, under the constraints that all data points are correctly classified according to the learning problem:
 \begin{equation*}
-\max_\mathbf{w}\left(\frac{1}{||\mathbf{w}||}\right) \quad \text{subject to} \quad y_n(\mathbf{w}^T\mathbf{x_n}+b)\geq 1 \quad \forall n
+\max_\mathbf{w}\left(\frac{1}{||\mathbf{w}||}\right) \quad \text{subject to} \quad y_n(\mathbf{w}^T\mathbf{x}_n+b)\geq 1 \quad \forall n
 \end{equation*}
 
 This function is not a nice shape for optimisation so we will instead solve the equivalent problem
 \begin{equation*}
-\min_\mathbf{w}\left(||\mathbf{w}||^2\right) \quad \text{subject to} \quad y_n(\mathbf{w}^T\mathbf{x_n}+b)\geq 1 \quad \forall n
+\min_\mathbf{w}\left(||\mathbf{w}||^2\right) \quad \text{subject to} \quad y_n(\mathbf{w}^T\mathbf{x}_n+b)\geq 1 \quad \forall n
 \end{equation*}
 
 As this is quadratic, it will behave well. Writing this as a lagrangian is the following:
 \begin{equation*}
-\mathcal{L}(\mathbf{w}, b, \mathbf{\lambda}) := ||\mathbf{w}||^2 - \sum_{n=1}^N\lambda_n(y_n(\mathbf{w}^T\mathbf{x_n}+b)-1), \, \lambda_n \geq 0
+\mathcal{L}(\mathbf{w}, b, \mathbf{\lambda}) := ||\mathbf{w}||^2 - \sum_{n=1}^N\lambda_n(y_n(\mathbf{w}^T\mathbf{x}_n+b)-1), \, \lambda_n \geq 0
 \end{equation*}
 
 As always with these problems we set $\mathbf{\nabla}\mathcal{L} = \mathbf{0}$.
 \begin{align*}
 \frac{\partial\mathcal{L}}{\partial b} =0 &\implies \sum_{n=1}^N\lambda_ny_n=0 \\
-\frac{\partial\mathcal{L}}{\partial \mathbf{w}} = 0 &\implies \mathbf{w} = \sum_{n=1}^N\lambda_ny_n\mathbf{x_n}
+\frac{\partial\mathcal{L}}{\partial \mathbf{w}} = 0 &\implies \mathbf{w} = \sum_{n=1}^N\lambda_ny_n\mathbf{x}_n
 \end{align*}
 
 This leads to the following quadratic programming problem, which can be solved numerically.
 \begin{equation*}
-\min_\mathbf{\lambda}\left(\sum_{i=1}^N\sum_{j=1}^N\lambda_i\lambda_jy_iy_j\mathbf{x_i}^T\mathbf{x_j}-\sum_{k=1}^N\lambda_k\right) \quad \text{subject to} \quad \lambda_n \geq 0 \quad \text{and} \quad \sum_{n=1}^N\lambda_ny_n=0
+\min_\mathbf{\lambda}\left(\sum_{i=1}^N\sum_{j=1}^N\lambda_i\lambda_jy_iy_j\mathbf{x}_i^T\mathbf{x_j}-\sum_{k=1}^N\lambda_k\right) \quad \text{subject to} \quad \lambda_n \geq 0 \quad \text{and} \quad \sum_{n=1}^N\lambda_ny_n=0
 \end{equation*}
 
-Finally, the bias term can be found using the support vectors $\mathbf{x_n}$
+Finally, the bias term can be found using the support vectors $\mathbf{x}_n$
 \begin{align*}
-y_n\left(\mathbf{w}^T\mathbf{x_n} + b\right) = 1 \\
-y_n^2\left(\mathbf{w}^T\mathbf{x_n} + b\right) = y_n \\
-\left(\mathbf{w}^T\mathbf{x_n} + b\right) = y_n \\
-\therefore b = y_n -\mathbf{w}^T\mathbf{x_n}
+y_n\left(\mathbf{w}^T\mathbf{x}_n + b\right) = 1 \\
+y_n^2\left(\mathbf{w}^T\mathbf{x}_n + b\right) = y_n \\
+1\left(\mathbf{w}^T\mathbf{x}_n + b\right) = y_n \\
+\therefore b = y_n -\mathbf{w}^T\mathbf{x}_n
 \end{align*}
 
 In practice, an average will be taken over all support vectors
 \begin{equation*}
-b = \frac{1}{N}\sum_{n=1}^N\left(y_n -\mathbf{w}^T\mathbf{x_n}\right)
+b = \frac{1}{N}\sum_{n=1}^N\left(y_n -\mathbf{w}^T\mathbf{x}_n\right)
 \end{equation*}
 
 ** Estimation
@@ -675,7 +680,7 @@ This is interesting because it is Bayes formula for $p(z_{nk}=1|\mathbf{x}_n, \p
 As the estimated parameters and $q_{nk}$ depend upon each-other, EM must be solved itteritively. One way to do this is to pick $q_{nk}$ by considering the distance to means and then to use these to compute the other parameters.
 
 *** K-Means
-The K-Means algorithm on input $\mathbf{X} = {\mathbf{x}_n^T}_{n=1}^N,\:K$ outputs a vector of mode centres $\mathbf{C}$ and $\mathrm{Idx}$, a vector containing the class assigned to each data point.
+The K-Means algorithm on input $\mathbf{X} = \{\mathbf{x}_n\}_{n=1}^N,\:K$ outputs a vector of mode centres $\mathbf{C}$ and $\mathrm{Idx}$, a vector containing the class assigned to each data point.
 #+BEGIN_SRC
 repeat
     assign n'th sample to the nearest centre
