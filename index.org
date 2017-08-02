@@ -1,7 +1,7 @@
 #+TITLE: Machine Learning Revision
 #+AUTHOR: Tom Eccles
 #+LATEX_HEADER: \usepackage{amsmath}
-#+HTML_MATHJAX: path:"https://cdn.mathjax.org/mathjax/latest/MathJax.js"
+#+HTML_MATHJAX: path:"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"
 
 * About This Document
 This document contains my revision notes for COMP3206 Machine Learning as taught by Professor Mahesan Niranjan at the University of Southampton. This work was produced based on his lectures but any inaccuracies and misunderstandings contained herein are almost certainly my own mistake. This does not represent the whole module, only what I expect to find on the exam.
